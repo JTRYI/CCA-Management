@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import users from "./routes/users.mjs";
 
 const PORT = process.env.PORT || 5050;
 const app = express();
@@ -7,9 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.get("/", async (req, res) => {
-    res.send("Hello World").status(200);
-});
+app.use("/", users);
 
 //start the express server
 app.listen(PORT, () => {
