@@ -1,0 +1,8 @@
+.app-container{
+    display: flex;
+}
+
+.content-container{
+    margin-left: 5%;
+    flex-grow: 1;
+}
