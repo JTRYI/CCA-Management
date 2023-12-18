@@ -4,11 +4,10 @@
 
 .loginForm {
     font-family: 'Lato'; /* Specify 'Lato' as the font family*/
-    position: relative;
-    top: 12%;
-    left: 60%;
+    margin-top: 5%;
+    margin-left: 60%;
     width: 480px;
-    height: 80vh;
+    height: 85vh;
     background-color: rgba(0, 0, 0, 0.4); /* Set opacity by adjusting the fourth parameter*/
     border-radius: 15px;
     backdrop-filter: blur(10px);
@@ -17,18 +16,18 @@
 /* Media query for smaller screens */
 @media screen and (max-width: 768px) {
     .loginForm {
-        left: 50%; /* Center the box horizontally */
+        margin-left: 50%; /* Center the box horizontally */
         transform: translateX(-50%);
-        width: 80%; /* Makes form become 80% of its original width */
+        width: 80%; /* Makes form become 80% of screen size */
     }
 }
 
 .form-heading{
     display: flex;
     align-items: center;
-    position: absolute;
-    top: 5%;
-    left: 10%;
+    padding-top: 8%;
+    padding-left: 10%;
+    margin-bottom: 5%;
 }
 
 .logoImage {
@@ -48,3 +47,37 @@
     font-style: italic;
     color: #996515;
 }
+
+.login-role {
+    color: white;
+    /* margin-left: 10%; */
+}
+
+.role-radio {
+    margin-top: 1%;
+    /* margin-left: 10%; */
+    color: white;
+}
+
+.email-form{
+    margin-top: 5%;
+    /* margin-left: 10%; */
+}
+
+.password-form {
+    margin-top: 2%;
+    /* margin-left: 10%; */
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 10%;
+  }
+
+.login-btn{
+    margin-top: 15%;
+    margin-left: 30%;
+}
+

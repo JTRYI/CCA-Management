@@ -2,12 +2,16 @@
 import { Route, Routes } from "react-router-dom";
 
 
-import LoginScreen from "./components/loginScreen/loginScreen";
+import LoginScreen from "./screens/loginScreen/loginScreen";
+import HomeScreen from "./screens/homeScreen/homeScreen";
 
 function App() {
   return (
     <div>
-      <LoginScreen />
+      <Routes>
+        <Route path="/" element={<LoginScreen />} />
+        <Route path="/home" element={<HomeScreen />} />
+      </Routes>
     </div>
   );
 }
