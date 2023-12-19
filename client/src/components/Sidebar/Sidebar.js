@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 import './Sidebar.css';
 import { NavLink, useNavigate } from 'react-router-dom';
 
 
 function Sidebar() {
+
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  // console.log(user);
 
   const [isExpanded, setExpandState] = useState(false);
 
@@ -61,6 +64,8 @@ function Sidebar() {
                   //handle logout
                   onClick={() => {
                     navigate('/')
+                    sessionStorage.removeItem('token');
+                    sessionStorage.removeItem('user');
                   }} 
                   className={isExpanded ? 'menu-item' : 'menu-item menu-item-NX'}
                 >
@@ -87,10 +92,10 @@ function Sidebar() {
       </div>
       <div className='nav-footer'>
         <div className={isExpanded ? 'nav-details' : 'nav-details nav-details-NX'}>
-          <img src='icons/universal-access-solid.svg' />
+          <img src={user.profilePic == null ? 'icons/universal-access-solid.svg' : user.profilePic} />
           <div className='nav-footer-info'>
-            <p className='nav-footer-user-name'>IamAdmin</p>
-            <p className='nav-footer-user-role'>Administrator</p>
+            <p className='nav-footer-user-name'>{user.name}</p>
+            <p className='nav-footer-user-role'>{user.isAdmin === true ? 'Administrator' : 'Member'}</p>
           </div>
         </div>
         <img className='user-edit' src='icons/user-pen-solid.svg' />

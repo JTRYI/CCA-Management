@@ -1,13 +1,17 @@
 import React from 'react';
+import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import './homeScreen.css';
-import Sidebar from '../../components/Sidebar/Sidebar';
 
-const HomeScreen = () => (
-  <div className="homeScreen">
-    HomeScreen Component
-  </div>
-);
+
+function HomeScreen() {
+
+  return (
+    <div className="homeScreen">
+      HomeScreen Component
+    </div>
+  );
+};
 
 HomeScreen.propTypes = {};
 

@@ -55,6 +55,7 @@ function LoginForm() {
         setEmail('');
         setPassword('');
         navigate('/home');
+        sessionStorage.setItem('token', data.token);
         // console.log(data.token);
 
       } else if (data.message == "Invalid Credentials") {
@@ -69,6 +70,8 @@ function LoginForm() {
     }
 
   };
+
+  
 
   return (
 
