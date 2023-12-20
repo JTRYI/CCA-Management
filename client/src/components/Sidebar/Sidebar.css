@@ -1,9 +1,12 @@
+/* Import Lato font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap');
+
 .side-nav-container{
     background-color: rgba(153, 101, 21, 0.6);
     width: 300px;
     height: 100vh;
     position: relative;
-    
+    font-family: 'Lato';
     transition: 0.4s;
 
 }

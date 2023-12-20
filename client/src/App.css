@@ -1,8 +1,11 @@
 .app-container{
     display: flex;
+    background-color: #f8f5f3;
+    overflow-x: hidden;
 }
 
 .content-container{
     margin-left: 5%;
-    flex-grow: 1;
+    flex: 1;
+    
 }
