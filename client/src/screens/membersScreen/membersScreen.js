@@ -2,6 +2,8 @@ import React from 'react';
 import './membersScreen.css';
 import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
+import { useDisclosure } from '@chakra-ui/react';
+import AddModal from '../../components/addModal/addModal';
 
 const Member = (props) => (
   <Tr>
@@ -12,7 +14,7 @@ const Member = (props) => (
       </div>
     </Td>
     <Td>
-     {props.member.instrument}
+      {props.member.instrument}
     </Td>
     <Td>
       {props.member.dateJoined}
@@ -26,6 +28,13 @@ const Member = (props) => (
 function MembersScreen() {
 
   const [members, setMembers] = useState([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [updateTrigger, setUpdateTrigger] = useState(false);
+
+  const handleModalClose = () => {
+    // Toggle the updateTrigger to trigger re-render
+    setUpdateTrigger((prev) => !prev);
+  };
 
   //This method fetches the members from the database
   useEffect(() => {
@@ -43,9 +52,9 @@ function MembersScreen() {
     }
 
     getMembers();
-
+    
     return;
-  }, [members.length]);
+  }, [updateTrigger]);
 
   //This method will map out the members on the table
   function memberList() {
@@ -94,9 +103,14 @@ function MembersScreen() {
                 backgroundColor: 'rgba(153, 101, 21, 1.0);'
               }
             }
+            onClick={() => {
+              onOpen();
+            }}
+
           >Add
             {<img src='icons/plus-solid.svg' style={{ paddingLeft: '5px' }} />}
           </Button>
+          <AddModal isOpen={isOpen} onOpen={onOpen} onClose={onClose} afterCloseCallback={handleModalClose}></AddModal>
         </div>
 
         <TableContainer className='members-table-container'>
