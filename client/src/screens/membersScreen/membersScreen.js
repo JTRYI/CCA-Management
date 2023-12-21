@@ -113,7 +113,7 @@ function MembersScreen() {
           <AddModal isOpen={isOpen} onOpen={onOpen} onClose={onClose} afterCloseCallback={handleModalClose}></AddModal>
         </div>
 
-        <TableContainer className='members-table-container'>
+        <TableContainer className='members-table-container' overflowY='auto'>
           <Table className='members-table' variant='striped' colorScheme='orange' size='sm'>
             <Thead>
               <Tr>
