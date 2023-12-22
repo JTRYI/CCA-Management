@@ -64,12 +64,7 @@
     display: flex;
     width: 38%;
     align-items: center;
-    transform: translateX(25%);
-}
-
-.name-profile img {
-    min-width: 45px;
-    padding-right: 10%;
+    transform: translateX(24%);
 }
 
 .dot-icon img{

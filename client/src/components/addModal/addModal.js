@@ -127,7 +127,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
           <ModalHeader fontWeight='bold' color='#996515' textAlign="center" gridColumn="1 / -1">
             Add New Member
           </ModalHeader>
-          <ModalCloseButton />
+          <ModalCloseButton onClick={() => { onClose(); afterCloseCallback(); setForm({ email: "", password: "", name: "", instrument: "", yearOfStudy: "", profilePic: null }); setIsSubmitted(false);}}/>
           <ModalBody className='add-modal-body'>
 
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
@@ -201,7 +201,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
                 {
                   color: 'white'
                 }
-              } onClick={() => { onClose(); afterCloseCallback(); }}>
+              } onClick={() => { onClose(); afterCloseCallback(); setForm({ email: "", password: "", name: "", instrument: "", yearOfStudy: "", profilePic: null }); setIsSubmitted(false); }}>
               Cancel
             </Button>
             <Button type='submit' backgroundColor='rgba(153, 101, 21, 1);'

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 import './Sidebar.css';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { Avatar } from '@chakra-ui/react';
 
 
 function Sidebar() {
@@ -66,7 +67,7 @@ function Sidebar() {
                     navigate('/')
                     sessionStorage.removeItem('token');
                     sessionStorage.removeItem('user');
-                  }} 
+                  }}
                   className={isExpanded ? 'menu-item' : 'menu-item menu-item-NX'}
                 >
                   <img src={icon} alt='' srcSet="" />
@@ -92,13 +93,16 @@ function Sidebar() {
       </div>
       <div className='nav-footer'>
         <div className={isExpanded ? 'nav-details' : 'nav-details nav-details-NX'}>
-          <img src={user.profilePic == null ? 'icons/universal-access-solid.svg' : user.profilePic} />
+          <Avatar size='md' name={user.name} src={user.profilePic == null ? 'https://bit.ly/broken-link' : user.profilePic} style={{ margin: '0 15px' }} />
           <div className='nav-footer-info'>
             <p className='nav-footer-user-name'>{user.name}</p>
             <p className='nav-footer-user-role'>{user.isAdmin === true ? 'Administrator' : 'Member'}</p>
           </div>
+          <div className='nav-footer-user-edit'>
+            <img src='icons/user-pen-solid.svg' style={{ width: '30px', marginLeft: '50px' }} />
+          </div>
         </div>
-        <img className='user-edit' src='icons/user-pen-solid.svg' />
+
       </div>
     </div>
   );

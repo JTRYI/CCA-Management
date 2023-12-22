@@ -179,10 +179,6 @@
     display: flex;
 }
 
-.nav-details-NX{
-    width: 300px;
-}
-
 .nav-details-NX .nav-footer-user-name {
     visibility: hidden;
 }
@@ -191,9 +187,8 @@
     visibility: hidden;
 }
 
-.nav-details img {
-    width: 80px;
-    padding: 0 20px;
+.nav-details-NX .nav-footer-user-edit{
+    visibility: hidden;
 }
 
 .nav-footer-user-name {
@@ -208,7 +203,8 @@
     color: red;
 }
 
-.user-edit{
-    width: 30px;
-    margin: auto;
+.nav-footer-user-edit{
+    display: flex;
+    width: 121px;
+    
 }

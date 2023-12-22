@@ -1,6 +1,6 @@
 import React from 'react';
 import './membersScreen.css';
-import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody } from '@chakra-ui/react';
+import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useDisclosure } from '@chakra-ui/react';
 import AddModal from '../../components/addModal/addModal';
@@ -9,7 +9,7 @@ const Member = (props) => (
   <Tr>
     <Td>
       <div className='name-profile'>
-        <img src={props.member.profilePic == null ? 'icons/universal-access-solid.svg' : props.member.profilePic} />
+        <Avatar size='md' name={props.member.name} src={props.member.profilePic == null ? 'https://bit.ly/broken-link' : props.member.profilePic} style={{marginRight: "10%"}}/>
         {props.member.name}
       </div>
     </Td>
@@ -52,7 +52,7 @@ function MembersScreen() {
     }
 
     getMembers();
-    
+
     return;
   }, [updateTrigger]);
 
@@ -115,7 +115,7 @@ function MembersScreen() {
 
         <TableContainer className='members-table-container' overflowY='auto'>
           <Table className='members-table' variant='striped' colorScheme='orange' size='sm'>
-            <Thead>
+            <Thead style={{position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1}}>
               <Tr>
                 <Th paddingY={5} paddingStart={20} color='#996515'>Name</Th>
                 <Th color='#996515'>Instrument</Th>
