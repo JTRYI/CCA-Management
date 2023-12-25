@@ -13,6 +13,7 @@ import {
 import { FormControl, FormLabel, FormErrorMessage, Input, Select } from '@chakra-ui/react';
 import { Grid, VStack, HStack } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react'
+import { Avatar } from '@chakra-ui/react';
 import { useState } from 'react';
 
 
@@ -133,7 +134,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
               {/* Left column for image */}
               <div className='add-image' >
-                <img src='icons/universal-access-solid.svg' style={{ width: '125px', height: '125px', borderRadius: '50%' }} id="target" />
+              <Avatar size='2xl' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
                 <input id="myinput" type="file" onChange={encode} style={{ fontSize: '12px', color: '#996515', paddingTop: '20%' }}></input>
               </div>
 

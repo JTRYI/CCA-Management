@@ -13,6 +13,7 @@ import {
 import { FormControl, FormLabel, FormErrorMessage, Input, Select } from '@chakra-ui/react';
 import { Grid, VStack, HStack } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react'
+import { Avatar } from '@chakra-ui/react';
 import { useState } from 'react';
 
 export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback, memberID }) {
@@ -59,33 +60,60 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const token = sessionStorage.getItem('token')
+  const toast = useToast();
 
   async function onSubmit(e) {
     e.preventDefault();
     setIsSubmitted(true);
-    
+
     if (form.email === '' || form.name === '' || form.instrument === '' || form.yearOfStudy === '') {
       return;
     }
+    try {
+      const id = memberID;
 
-    const id = memberID;
+      const editedPerson = {
+        email: form.email,
+        name: form.name,
+        instrument: form.instrument,
+        yearOfStudy: form.yearOfStudy,
+        profilePic: form.profilePic
+      };
 
-    const editedPerson = {
-      email: form.email,
-      name: form.name,
-      instrument: form.instrument,
-      yearOfStudy: form.yearOfStudy,
-      profilePic: form.profilePic
-    };
+      // This will send a post request to update the data in the database.
+      const response = await fetch(`http://localhost:5050/member/${token}/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(editedPerson),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+      });
 
-    // This will send a post request to update the data in the database.
-    await fetch(`http://localhost:5050/member/${token}/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(editedPerson),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    });
+      const data = await response.json();
+
+      if (data.message == "Email Already Exists") {
+
+        toast({
+          title: 'Failed to Update Member',
+          description: "Email Already in Use!",
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+
+      } else if (response.status === 200) {
+        toast({
+          title: 'Request Successful',
+          description: "Member Updated Successfully!",
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
+    } catch (error) {
+      window.alert(error)
+      return;
+    }
 
     // Close the modal after successful submission
     onClose();
@@ -129,7 +157,7 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
               {/* Left column for image */}
               <div className='update-image' >
-                <img src={form.profilePic == null ? 'icons/universal-access-solid.svg' : form.profilePic} style={{ width: '125px', height: '125px', borderRadius: '50%' }} id="target" />
+                <Avatar size='2xl' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
                 <input id="myinput" type="file" onChange={encode} style={{ fontSize: '12px', color: '#996515', paddingTop: '20%' }}></input>
               </div>
 

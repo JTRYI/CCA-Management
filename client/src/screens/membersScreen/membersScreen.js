@@ -2,19 +2,28 @@ import React from 'react';
 import './membersScreen.css';
 import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar, Menu, MenuList, MenuItem, MenuButton, IconButton, Icon } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
-import { useDisclosure } from '@chakra-ui/react';
+import { useDisclosure, useToast } from '@chakra-ui/react';
 import AddModal from '../../components/addModal/addModal';
 import { FiMoreVertical } from 'react-icons/fi';
 import { FaRegEye } from "react-icons/fa";
 import { ImPencil } from "react-icons/im";
 import { ImBin } from "react-icons/im";
 import EditModal from '../../components/editModal/editModal';
+import {
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogContent,
+  AlertDialogOverlay,
+} from '@chakra-ui/react'
 
 const Member = (props) => {
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const editProfileDisclosure = useDisclosure();
+  const deleteProfileDisclosure = useDisclosure();
   const [editProfileClicked, setEditProfileClicked] = useState(false);
-
+  
   return (
     <Tr>
       <Td>
@@ -38,24 +47,53 @@ const Member = (props) => {
             </MenuItem>
             <MenuItem icon={<ImPencil />} onClick={() => {
               setEditProfileClicked(true);
-              onOpen(props.member._id);
+              editProfileDisclosure.onOpen();
             }}>
               Edit Profile
             </MenuItem>
             {editProfileClicked && (
               <EditModal
-                isOpen={isOpen}
-                onOpen={onOpen}
+                isOpen={editProfileDisclosure.isOpen}
+                onOpen={editProfileDisclosure.onOpen}
                 onClose={() => {
                   setEditProfileClicked(false);
-                  onClose();
+                  editProfileDisclosure.onClose();
                 }}
                 afterCloseCallback={props.handleModalClose}
                 memberID={props.member._id} />
             )}
-            <MenuItem icon={<ImBin />}>
-              Delete Profile
+
+            <MenuItem icon={<ImBin />} onClick={deleteProfileDisclosure.onOpen}>
+              Delete Member
             </MenuItem>
+            <AlertDialog
+              isOpen={deleteProfileDisclosure.isOpen}
+              onClose={deleteProfileDisclosure.onClose}
+            >
+              <AlertDialogOverlay>
+                <AlertDialogContent>
+                  <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                    {`Delete ${props.member.name}`}
+                  </AlertDialogHeader>
+
+                  <AlertDialogBody>
+                    Are you sure? You can't undo this action afterwards.
+                  </AlertDialogBody>
+                  <AlertDialogFooter>
+                    <Button onClick={deleteProfileDisclosure.onClose}>
+                      Cancel
+                    </Button>
+                    <Button colorScheme='red'
+                      onClick={() => {
+                        props.deleteMember(props.member._id);
+                        deleteProfileDisclosure.onClose();
+                      }} ml={3}>
+                      Delete
+                    </Button>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialogOverlay>
+            </AlertDialog>
           </MenuList>
         </Menu>
       </Td>
@@ -68,6 +106,7 @@ function MembersScreen() {
   const [members, setMembers] = useState([]);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [updateTrigger, setUpdateTrigger] = useState(false);
+  const toast = useToast();
 
   const handleModalClose = () => {
     // Toggle the updateTrigger to trigger re-render
@@ -94,6 +133,27 @@ function MembersScreen() {
     return;
   }, [updateTrigger]);
 
+
+  const token = sessionStorage.getItem('token');
+
+  //This method will delete a Member
+  async function deleteMember(id) {
+    await fetch(`http://localhost:5050/member/${token}/${id}`, {
+      method: "DELETE"
+    });
+
+    const newMembers = members.filter((el) => el._id !== id);
+    setMembers(newMembers);
+
+    toast({
+      title: 'Request Successful',
+      description: "Member Deleted Successfully!",
+      status: 'success',
+      duration: 5000,
+      isClosable: true,
+    })
+  }
+
   //This method will map out the members on the table
   function memberList() {
     return members.map((member) => {
@@ -102,6 +162,9 @@ function MembersScreen() {
           member={member}
           key={member._id}
           handleModalClose={handleModalClose}
+          deleteMember={() => {
+            deleteMember(member._id);
+          }}
         />
       );
     });
