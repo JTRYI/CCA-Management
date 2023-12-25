@@ -1,29 +1,67 @@
 import React from 'react';
 import './membersScreen.css';
-import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar } from '@chakra-ui/react';
+import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar, Menu, MenuList, MenuItem, MenuButton, IconButton, Icon } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useDisclosure } from '@chakra-ui/react';
 import AddModal from '../../components/addModal/addModal';
+import { FiMoreVertical } from 'react-icons/fi';
+import { FaRegEye } from "react-icons/fa";
+import { ImPencil } from "react-icons/im";
+import { ImBin } from "react-icons/im";
+import EditModal from '../../components/editModal/editModal';
 
-const Member = (props) => (
-  <Tr>
-    <Td>
-      <div className='name-profile'>
-        <Avatar size='md' name={props.member.name} src={props.member.profilePic == null ? 'https://bit.ly/broken-link' : props.member.profilePic} style={{marginRight: "10%"}}/>
-        {props.member.name}
-      </div>
-    </Td>
-    <Td>
-      {props.member.instrument}
-    </Td>
-    <Td>
-      {props.member.dateJoined}
-    </Td>
-    <Td className='dot-icon'>
-      <img src='icons/ellipsis-vertical-solid.svg' />
-    </Td>
-  </Tr>
-);
+const Member = (props) => {
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [editProfileClicked, setEditProfileClicked] = useState(false);
+
+  return (
+    <Tr>
+      <Td>
+        <div className='name-profile'>
+          <Avatar size='md' name={props.member.name} src={props.member.profilePic == null ? 'https://bit.ly/broken-link' : props.member.profilePic} style={{ marginRight: "10%" }} />
+          {props.member.name}
+        </div>
+      </Td>
+      <Td>
+        {props.member.instrument}
+      </Td>
+      <Td>
+        {props.member.dateJoined}
+      </Td>
+      <Td className='dot-icon'>
+        <Menu>
+          <MenuButton as={IconButton} variant='' icon={<Icon as={FiMoreVertical} />} style={{ transform: 'translateX(8px)' }} />
+          <MenuList>
+            <MenuItem icon={<FaRegEye />}>
+              View Profile
+            </MenuItem>
+            <MenuItem icon={<ImPencil />} onClick={() => {
+              setEditProfileClicked(true);
+              onOpen(props.member._id);
+            }}>
+              Edit Profile
+            </MenuItem>
+            {editProfileClicked && (
+              <EditModal
+                isOpen={isOpen}
+                onOpen={onOpen}
+                onClose={() => {
+                  setEditProfileClicked(false);
+                  onClose();
+                }}
+                afterCloseCallback={props.handleModalClose}
+                memberID={props.member._id} />
+            )}
+            <MenuItem icon={<ImBin />}>
+              Delete Profile
+            </MenuItem>
+          </MenuList>
+        </Menu>
+      </Td>
+    </Tr>
+  );
+};
 
 function MembersScreen() {
 
@@ -63,6 +101,7 @@ function MembersScreen() {
         <Member
           member={member}
           key={member._id}
+          handleModalClose={handleModalClose}
         />
       );
     });
@@ -115,7 +154,7 @@ function MembersScreen() {
 
         <TableContainer className='members-table-container' overflowY='auto'>
           <Table className='members-table' variant='striped' colorScheme='orange' size='sm'>
-            <Thead style={{position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1}}>
+            <Thead style={{ position: 'sticky', top: 0, backgroundColor: 'white', zIndex: 1 }}>
               <Tr>
                 <Th paddingY={5} paddingStart={20} color='#996515'>Name</Th>
                 <Th color='#996515'>Instrument</Th>

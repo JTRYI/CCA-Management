@@ -88,7 +88,6 @@ function Sidebar() {
             ))
           }
 
-
         </div>
       </div>
       <div className='nav-footer'>

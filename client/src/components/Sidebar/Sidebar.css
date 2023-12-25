@@ -175,6 +175,10 @@
     padding: 2px;
 }
 
+.nav-footer-info{
+    margin-top: 4px;
+}
+
 .nav-details{
     display: flex;
 }

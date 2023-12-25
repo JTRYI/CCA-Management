@@ -131,6 +131,26 @@ router.post("/member/add/:token", async (req, res) => {
     }
 });
 
+//Get Member by ID
+router.get("/member/:id", async (req, res) => {
+
+    let collection = await db.collection("users");
+
+    try {
+        let query = { _id: new ObjectId(req.params.id) };
+        let result = await collection.findOne(query);
+
+        if (!result) {
+            res.status(404).json({ message: "Member Not Found" });
+        } else {
+            res.status(200).json(result);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+
+});
+
 //Update Member
 router.patch("/member/:token/:id", async (req, res) => {
 
@@ -151,13 +171,9 @@ router.patch("/member/:token/:id", async (req, res) => {
             return res.status(400).json({ message: "Email Already Exists" });
         }
 
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-
         const updates = {
             $set: {
                 email: req.body.email,
-                password: hashedPassword,
                 name: req.body.name,
                 instrument: req.body.instrument,
                 yearOfStudy: req.body.yearOfStudy,

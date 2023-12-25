@@ -55,7 +55,6 @@
     height: 0;
   }
 
-
 .members-table{
     margin-bottom: 30px;
 }
@@ -67,6 +66,3 @@
     transform: translateX(24%);
 }
 
-.dot-icon img{
-    transform: translateX(26px);
-}
