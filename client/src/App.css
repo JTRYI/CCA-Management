@@ -2,13 +2,16 @@ body{
     overflow: hidden;
 }
 
-.app-container{
+.app-container {
     display: flex;
     background-color: #f8f5f3;
     height: 100vh;
 }
 
-.content-container{
+.content-container {
     margin-left: 5%;
     flex: 1;
+    max-height: 100vh;
+    overflow-y: auto; /* Enable vertical scrolling when content exceeds the container height */
+
 }

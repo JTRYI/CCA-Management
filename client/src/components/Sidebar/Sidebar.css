@@ -195,6 +195,10 @@
     visibility: hidden;
 }
 
+.nav-footer-info {
+    width: 222px;
+}
+
 .nav-footer-user-name {
     font-size: 15px;
     font-weight: bold;
@@ -205,10 +209,4 @@
     font-size: 14px;
     font-weight: lighter;
     color: red;
-}
-
-.nav-footer-user-edit{
-    display: flex;
-    width: 121px;
-    
 }

@@ -97,9 +97,6 @@ function Sidebar() {
             <p className='nav-footer-user-name'>{user.name}</p>
             <p className='nav-footer-user-role'>{user.isAdmin === true ? 'Administrator' : 'Member'}</p>
           </div>
-          <div className='nav-footer-user-edit'>
-            <img src='icons/user-pen-solid.svg' style={{ width: '30px', marginLeft: '50px' }} />
-          </div>
         </div>
 
       </div>
