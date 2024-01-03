@@ -17,11 +17,14 @@ import {
   AlertDialogContent,
   AlertDialogOverlay,
 } from '@chakra-ui/react'
+import ViewModal from '../../components/viewModal/viewModal';
 
 const Member = (props) => {
 
+  const viewProfileDisclosure = useDisclosure();
   const editProfileDisclosure = useDisclosure();
   const deleteProfileDisclosure = useDisclosure();
+  const [viewProfileClicked, setViewProfileClicked] = useState(false);
   const [editProfileClicked, setEditProfileClicked] = useState(false);
   const user = JSON.parse(sessionStorage.getItem('user'));
   
@@ -43,9 +46,21 @@ const Member = (props) => {
         <Menu>
           <MenuButton as={IconButton} variant='' icon={<Icon as={FiMoreVertical} />} style={{ transform: 'translateX(8px)' }} />
           <MenuList>
-            <MenuItem icon={<FaRegEye />}>
+            <MenuItem icon={<FaRegEye />} onClick={() => {
+              setViewProfileClicked(true);
+              viewProfileDisclosure.onOpen();
+            } }>
               View Profile
             </MenuItem>
+            {viewProfileClicked && (
+              <ViewModal isOpen={viewProfileDisclosure.isOpen} 
+              onClose={ () => {
+                setViewProfileClicked(false);
+                viewProfileDisclosure.onClose();
+              }} 
+              memberID={props.member._id}/>
+              )}
+
             <MenuItem icon={<ImPencil />} onClick={() => {
               setEditProfileClicked(true);
               editProfileDisclosure.onOpen();
