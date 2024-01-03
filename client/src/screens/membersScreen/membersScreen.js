@@ -23,6 +23,7 @@ const Member = (props) => {
   const editProfileDisclosure = useDisclosure();
   const deleteProfileDisclosure = useDisclosure();
   const [editProfileClicked, setEditProfileClicked] = useState(false);
+  const user = JSON.parse(sessionStorage.getItem('user'));
   
   return (
     <Tr>
@@ -48,7 +49,8 @@ const Member = (props) => {
             <MenuItem icon={<ImPencil />} onClick={() => {
               setEditProfileClicked(true);
               editProfileDisclosure.onOpen();
-            }}>
+            }}
+            style={{ display: user.isAdmin ? 'block' : 'none' }}>
               Edit Profile
             </MenuItem>
             {editProfileClicked && (
@@ -63,7 +65,7 @@ const Member = (props) => {
                 memberID={props.member._id} />
             )}
 
-            <MenuItem icon={<ImBin />} onClick={deleteProfileDisclosure.onOpen}>
+            <MenuItem icon={<ImBin />} onClick={deleteProfileDisclosure.onOpen} style={{ display: user.isAdmin ? 'block' : 'none' }}>
               Delete Member
             </MenuItem>
             <AlertDialog
@@ -170,6 +172,8 @@ function MembersScreen() {
     });
   }
 
+  const user = JSON.parse(sessionStorage.getItem('user'));
+
   return (
     <div className="membersScreen">
       <div className='members-container'>
@@ -208,6 +212,8 @@ function MembersScreen() {
             onClick={() => {
               onOpen();
             }}
+            
+            style={{ visibility: user.isAdmin ? 'visible' : 'hidden' }}
 
           >Add
             {<img src='icons/plus-solid.svg' style={{ paddingLeft: '5px' }} />}

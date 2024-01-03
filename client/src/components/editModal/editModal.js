@@ -157,7 +157,8 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
               {/* Left column for image */}
               <div className='update-image' >
-                <Avatar size='2xl' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
+                <Avatar size='2xl' name={form.profilePic == null ? form.name : null}  // Display name only if profilePic is null
+                src={form.profilePic} id="target" />
                 <input id="myinput" type="file" onChange={encode} style={{ fontSize: '12px', color: '#996515', paddingTop: '20%' }}></input>
               </div>
 
