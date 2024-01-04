@@ -1,9 +1,8 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import './loginForm.css';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Radio, RadioGroup, Stack, Input } from '@chakra-ui/react'
+import { Radio, RadioGroup, Stack, Input, InputGroup, InputRightElement } from '@chakra-ui/react'
 import {
   FormControl,
   FormLabel,
@@ -17,7 +16,10 @@ function LoginForm() {
   const [password, setPassword] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [selectedRole, setSelectedRole] = useState('false'); // Default value 'false' for Member
-  
+  const [show, setShow] = useState(false);
+  const handleClick = () => setShow(!show);
+
+
   const handleInputChange = (e) => setEmail(e.target.value)
   const handlePasswordInputChange = (e) => setPassword(e.target.value)
 
@@ -71,7 +73,7 @@ function LoginForm() {
 
   };
 
-  
+
 
   return (
 
@@ -96,7 +98,14 @@ function LoginForm() {
 
         <FormControl className='password-form' isInvalid={isPasswordError}>
           <FormLabel color={'white'} >Password</FormLabel>
-          <Input type='password' width="90%" textColor={'white'} focusBorderColor='white' value={password} onChange={handlePasswordInputChange} />
+          <InputGroup>
+            <Input type={show ? 'text' : 'password'} width="90%" textColor={'white'} focusBorderColor='white' value={password} onChange={handlePasswordInputChange} />
+            <InputRightElement width='4.5rem'>
+            <Button h='1.75rem' size='sm' onClick={handleClick} style={{transform: 'translateX(-45px)', textDecoration: 'none'}} variant='link'> {/*setting variant to "link" for a simple text button*/}
+              {show ? 'Hide' : 'Show'}
+            </Button>
+          </InputRightElement>
+          </InputGroup>
           <FormErrorMessage>Password is required.</FormErrorMessage>
         </FormControl>
 
@@ -110,10 +119,10 @@ function LoginForm() {
         </Button>
 
       </form>
-      
+
     </div>
-    
-    
+
+
   );
 
 }

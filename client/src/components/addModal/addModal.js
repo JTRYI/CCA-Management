@@ -10,7 +10,7 @@ import {
   ModalCloseButton,
   Button
 } from '@chakra-ui/react'
-import { FormControl, FormLabel, FormErrorMessage, Input, Select } from '@chakra-ui/react';
+import { FormControl, FormLabel, FormErrorMessage, Input, Select, InputGroup, InputRightElement } from '@chakra-ui/react';
 import { Grid, VStack, HStack } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react'
 import { Avatar } from '@chakra-ui/react';
@@ -20,6 +20,9 @@ import { useState } from 'react';
 function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
 
   const initialRef = React.useRef(null);
+
+  const [show, setShow] = useState(false);
+  const handleClick = () => setShow(!show);
 
   let picture;
   function encode() {
@@ -85,7 +88,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
       const data = await response.json();
 
       if (data.message == "Email Already in Use") {
-        
+
         toast({
           title: 'Failed to Add Member',
           description: "Email Already in Use!",
@@ -128,13 +131,13 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
           <ModalHeader fontWeight='bold' color='#996515' textAlign="center" gridColumn="1 / -1">
             Add New Member
           </ModalHeader>
-          <ModalCloseButton onClick={() => { onClose(); afterCloseCallback(); setForm({ email: "", password: "", name: "", instrument: "", yearOfStudy: "", profilePic: null }); setIsSubmitted(false);}}/>
+          <ModalCloseButton onClick={() => { onClose(); afterCloseCallback(); setForm({ email: "", password: "", name: "", instrument: "", yearOfStudy: "", profilePic: null }); setIsSubmitted(false); }} />
           <ModalBody className='add-modal-body'>
 
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
               {/* Left column for image */}
               <div className='add-image' >
-              <Avatar size='2xl' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
+                <Avatar size='2xl' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
                 <input id="myinput" type="file" onChange={encode} style={{ fontSize: '12px', color: '#996515', paddingTop: '20%' }}></input>
               </div>
 
@@ -150,9 +153,14 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
 
                 <FormControl isInvalid={isSubmitted && form.password === ''}>
                   <FormLabel color='#996515' >Password</FormLabel>
-                  <Input type='password' focusBorderColor='#996515'
-                    value={form.password}
-                    onChange={(e) => updateForm({ password: e.target.value })} />
+                  <InputGroup>
+                    <Input type={show ? 'text' : 'password'} focusBorderColor='#996515' value={form.password} onChange={(e) => updateForm({ password: e.target.value })} />
+                    <InputRightElement width='4.5rem'>
+                      <Button h='1.75rem' size='sm' onClick={handleClick} style={{textDecoration: 'none' }} variant='link'> {/*setting variant to "link" for a simple text button*/}
+                        {show ? 'Hide' : 'Show'}
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
                   <FormErrorMessage>Password is missing.</FormErrorMessage>
                 </FormControl>
 
@@ -216,7 +224,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
           </ModalFooter>
         </form>
       </ModalContent>
-      
+
     </Modal>
   );
 }

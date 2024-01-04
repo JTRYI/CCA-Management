@@ -32,7 +32,8 @@ const Member = (props) => {
     <Tr>
       <Td>
         <div className='name-profile'>
-          <Avatar size='md' name={props.member.name} src={props.member.profilePic == null ? 'https://bit.ly/broken-link' : props.member.profilePic} style={{ marginRight: "10%" }} />
+          <Avatar size='md' name={props.member.profilePic == null ? props.member.name : null}  // Display name only if profilePic is null
+                src={props.member.profilePic} style={{ marginRight: "10%" }} />
           {props.member.name}
         </div>
       </Td>
