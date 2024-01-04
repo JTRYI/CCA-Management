@@ -1,1 +1,15 @@
-.AnnouncementScreen {}
+.announcementScreen {
+    width: auto;
+    height: auto;
+    margin-top: 60px;
+    margin-left: 8%;
+    margin-right: 13%;
+    font-family: 'Lato';
+}
+
+.top-head-anno{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}

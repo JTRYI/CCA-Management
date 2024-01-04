@@ -37,6 +37,23 @@ function Sidebar() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setExpandState(false);
+      }
+    };
+
+    // Attaching a event listening to check for screen resize, when screen resize, calls handleResize function
+    window.addEventListener('resize', handleResize);
+
+    // Calling it once to set the initial state
+    handleResize();
+
+    // Removing the event listener when the component is unmounted
+    return () => window.removeEventListener('resize', handleResize);
+  }, []); // Empty dependency array ensures that this effect runs only once on mount
+
   return (
     <div className={isExpanded ? 'side-nav-container' : 'side-nav-container side-nav-container-NX'}>
       <div className='nav-upper'>
@@ -48,7 +65,12 @@ function Sidebar() {
             </div>
           )}
           <button className={isExpanded ? 'hamburger hamburger-in' : 'hamburger hamburger-out'}
-            onClick={() => setExpandState(!isExpanded)}
+            onClick={() => {
+              if (window.innerWidth > 768) {
+                setExpandState(!isExpanded)
+              }
+            }
+            }
           >
             <span></span>
             <span></span>
