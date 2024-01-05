@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import './announcementScreen.css';
-import { Button } from '@chakra-ui/react';
+import { Button, useDisclosure } from '@chakra-ui/react';
 import { ImPencil } from "react-icons/im";
 import { ImBin } from "react-icons/im";
+import AddAnnouncementModal from '../../components/addAnnouncementModal/addAnnouncementModal';
 
 const Announcement = (props) => {
 
@@ -26,6 +27,13 @@ function AnnouncementScreen() {
   const user = JSON.parse(sessionStorage.getItem('user'));
 
   const [announcements, setAnnouncement] = useState([]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [updateTrigger, setUpdateTrigger] = useState(false);
+
+  const handleModalClose = () => {
+    // Toggle the updateTrigger to trigger re-render
+    setUpdateTrigger((prev) => !prev);
+  };
 
   useEffect(() => {
     async function getAnnouncements() {
@@ -44,7 +52,7 @@ function AnnouncementScreen() {
     getAnnouncements();
 
     return;
-  }, [])
+  }, [updateTrigger])
 
   function announcementList() {
     return announcements.map((announcement) => {
@@ -70,9 +78,14 @@ function AnnouncementScreen() {
             }
           }
           style={{ visibility: user.isAdmin ? 'visible' : 'hidden' }}
+
+          onClick={() => {
+            onOpen();
+          }}
         >Add
           {<img src='icons/plus-solid.svg' style={{ paddingLeft: '5px' }} />}
         </Button>
+        <AddAnnouncementModal isOpen={isOpen} onOpen={onOpen} onClose={onClose} afterCloseCallback={handleModalClose}></AddAnnouncementModal>
       </div>
 
       <div className='announcements-container' style={{ marginTop: '30px' }}>
