@@ -6,7 +6,7 @@ var secret = "secretkey";
 
 const router = express.Router();
 
-//Get Announcements
+//Get all Announcements
 router.get("/announcements", async (req, res) => {
 
     try {
@@ -21,6 +21,27 @@ router.get("/announcements", async (req, res) => {
     }
 
 });
+
+//Get Announcement by ID
+router.get("/announcements/:id", async (req, res) => {
+
+    let collection = await db.collection("announcements");
+
+    try {
+        let query = { _id: new ObjectId(req.params.id) };
+        let result = await collection.findOne(query);
+
+        if (!result) {
+            res.status(404).json({ message: "Announcement Not Found" });
+        } else {
+            res.status(200).json(result);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+
+});
+
 
 //Add Announcements
 router.post("/announcements/add/:token", async (req, res) => {

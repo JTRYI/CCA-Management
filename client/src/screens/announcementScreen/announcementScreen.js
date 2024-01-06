@@ -4,15 +4,31 @@ import { Button, useDisclosure } from '@chakra-ui/react';
 import { ImPencil } from "react-icons/im";
 import { ImBin } from "react-icons/im";
 import AddAnnouncementModal from '../../components/addAnnouncementModal/addAnnouncementModal';
+import EditAnnouncementModal from '../../components/editAnnouncementModal/editAnnouncementModal'
 
 const Announcement = (props) => {
+
+  const editAnnouncementDisclosure = useDisclosure();
+  const [editAnnouncementClicked, setEditAnnouncementClicked] = useState(false);
 
   return (
     <div className='announcement-block' style={{ width: '100%', backgroundColor: 'white', height: 'auto', borderRadius: '15px', marginBottom: '20px' }}>
       <div className='padding-box' style={{ display: 'flex', flexDirection: 'column', padding: '20px', position: 'relative' }}>
         <h1 style={{ paddingBottom: '10px', fontSize: '18px', fontWeight: 'bold' }}>{props.announcement.title}</h1>
-        <div className='edi-del-icons' style={{ display: 'flex', position: 'absolute', top: '20px', right: '20px'}}>
-          <ImPencil style={{ marginRight: '15px', color: '#996515' }} />
+        <div className='edi-del-icons' style={{ display: 'flex', position: 'absolute', top: '20px', right: '20px' }}>
+          <ImPencil style={{ marginRight: '15px', color: '#996515', cursor: 'pointer' }} onClick={() => {
+            setEditAnnouncementClicked(true);
+            editAnnouncementDisclosure.onOpen();
+          }} />
+          {editAnnouncementClicked && (
+            <EditAnnouncementModal isOpen={editAnnouncementDisclosure.isOpen}
+              onClose={() => {
+                setEditAnnouncementClicked(false);
+                editAnnouncementDisclosure.onClose();
+              }}
+              announcementID={props.announcement._id}
+              afterCloseCallback={props.handleModalClose} />
+          )}
           <ImBin style={{ color: 'red' }} />
         </div>
         <p>{props.announcement.description}</p>
@@ -60,6 +76,7 @@ function AnnouncementScreen() {
         <Announcement
           announcement={announcement}
           key={announcement._id}
+          handleModalClose={handleModalClose}
         />
       );
     })
