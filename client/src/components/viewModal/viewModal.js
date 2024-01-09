@@ -54,7 +54,7 @@ function ViewModal({onClose, isOpen, memberID}) {
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
         <ModalContent style={{display: 'flex', alignItems: 'center'}}>
-        <Avatar size='xl' name={form.profilePic == null ? form.name : null}  // Display name only if profilePic is null
+        <Avatar size='xl' bg='yellow.400' name={form.profilePic == null ? form.name : null}  // Display name only if profilePic is null
                 src={form.profilePic} style={{transform: 'translateY(-45px)'}} />
           <ModalHeader style={{transform: 'translateY(-45px)'}}>{form.name}</ModalHeader>
           <ModalBody style={{display: 'flex', flexDirection: 'column', alignItems:'center', transform: 'translateY(-35px)'}}>

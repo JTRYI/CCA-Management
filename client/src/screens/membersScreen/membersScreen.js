@@ -32,7 +32,7 @@ const Member = (props) => {
     <Tr>
       <Td>
         <div className='name-profile'>
-          <Avatar size='md' name={props.member.profilePic == null ? props.member.name : null}  // Display name only if profilePic is null
+          <Avatar size='md' bg='yellow.400' name={props.member.profilePic == null ? props.member.name : null}  // Display name only if profilePic is null
                 src={props.member.profilePic} style={{ marginRight: "10%" }} />
           {props.member.name}
         </div>
@@ -206,6 +206,8 @@ function MembersScreen() {
                 borderColor: 'black'
               }
             }
+
+            
           />
           <InputRightElement>
             <img src='icons/magnifying-glass-solid.svg'></img>

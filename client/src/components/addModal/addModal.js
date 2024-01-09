@@ -24,22 +24,39 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
-  let picture;
-  function encode() {
 
-    var selectedfile = document.getElementById("myinput").files;
-    if (selectedfile.length > 0) {
-      var imageFile = selectedfile[0];
+  function encode() {
+    var selectedFileInput = document.getElementById("myinput");
+    var selectedFiles = selectedFileInput.files;
+
+    if (selectedFiles.length > 0) {
+      var imageFile = selectedFiles[0];
+
+      // Check if the file extension is valid (png, jpeg, or jpg)
+      const allowedExtensions = ['png', 'jpeg', 'jpg'];
+      const fileExtension = imageFile.name.split('.').pop().toLowerCase();
+
+      if (!allowedExtensions.includes(fileExtension)) {
+        // Invalid file extension, show alert and reset the input and the avatar
+        window.alert('Only PNG, JPEG, and JPG files are allowed.');
+        selectedFileInput.value = ''; // Clear the file input
+        updateForm({ profilePic: null });
+        document.getElementById("target").src = 'https://bit.ly/broken-link';
+        return;
+      }
+
       var fileReader = new FileReader();
       fileReader.onload = function (fileLoadedEvent) {
-        picture = fileLoadedEvent.target.result;
-        updateForm({ profilePic: picture }); // Set the profilePic value in the form state
+        // Update the form state and the avatar with the loaded image
+        const picture = fileLoadedEvent.target.result;
+        updateForm({ profilePic: picture });
         document.getElementById("target").src = picture;
-      }
+
+      };
       fileReader.readAsDataURL(imageFile);
     }
-
   }
+
 
   const token = sessionStorage.getItem('token')
 
@@ -137,7 +154,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
               {/* Left column for image */}
               <div className='add-image' >
-                <Avatar size='2xl' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
+                <Avatar key={form.profilePic || 'default-key'} size='2xl' bg='yellow.400' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
                 <input id="myinput" type="file" onChange={encode} style={{ fontSize: '12px', color: '#996515', paddingTop: '20%' }}></input>
               </div>
 
@@ -156,7 +173,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
                   <InputGroup>
                     <Input type={show ? 'text' : 'password'} focusBorderColor='#996515' value={form.password} onChange={(e) => updateForm({ password: e.target.value })} />
                     <InputRightElement width='4.5rem'>
-                      <Button h='1.75rem' size='sm' onClick={handleClick} style={{textDecoration: 'none' }} variant='link'> {/*setting variant to "link" for a simple text button*/}
+                      <Button h='1.75rem' size='sm' onClick={handleClick} style={{ textDecoration: 'none' }} variant='link'> {/*setting variant to "link" for a simple text button*/}
                         {show ? 'Hide' : 'Show'}
                       </Button>
                     </InputRightElement>
