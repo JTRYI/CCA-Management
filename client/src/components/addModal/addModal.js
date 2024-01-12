@@ -27,32 +27,42 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
 
   function encode() {
     var selectedFileInput = document.getElementById("myinput");
+    // Get the selected files from the input element
     var selectedFiles = selectedFileInput.files;
 
+    // Check if at least one file is selected
     if (selectedFiles.length > 0) {
+      // Get the first (and usually only) file from the selected files
       var imageFile = selectedFiles[0];
 
       // Check if the file extension is valid (png, jpeg, or jpg)
       const allowedExtensions = ['png', 'jpeg', 'jpg'];
       const fileExtension = imageFile.name.split('.').pop().toLowerCase();
 
+      // If the file extension is not in the allowedExtensions array
       if (!allowedExtensions.includes(fileExtension)) {
         // Invalid file extension, show alert and reset the input and the avatar
         window.alert('Only PNG, JPEG, and JPG files are allowed.');
         selectedFileInput.value = ''; // Clear the file input
+        // Update the form state to indicate no profile picture
         updateForm({ profilePic: null });
+         // Setting the source of the avatar image to a placeholder or broken link
         document.getElementById("target").src = 'https://bit.ly/broken-link';
         return;
       }
 
+      // If the file extension is valid, create a FileReader to read the file
       var fileReader = new FileReader();
+      // Defining a callback function to be executed when the file is loaded
       fileReader.onload = function (fileLoadedEvent) {
-        // Update the form state and the avatar with the loaded image
+        // Get the base64-encoded data URL of the loaded image
         const picture = fileLoadedEvent.target.result;
+        // Update the form state and the avatar with the loaded image
         updateForm({ profilePic: picture });
         document.getElementById("target").src = picture;
 
       };
+      // Read the file as a data URL (base64-encoded)
       fileReader.readAsDataURL(imageFile);
     }
   }
