@@ -28,6 +28,13 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
     profilePic: null
   });
 
+  const [validationErrors, setValidationErrors] = useState({
+    email: '',
+    name: '',
+    instrument: '',
+    yearOfStudy: ''
+  });
+
   useEffect(() => {
     async function fetchData() {
       const id = memberID;
@@ -58,17 +65,76 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
     });
   }
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const token = sessionStorage.getItem('token')
   const toast = useToast();
 
   async function onSubmit(e) {
     e.preventDefault();
-    setIsSubmitted(true);
 
-    if (form.email === '' || form.name === '' || form.instrument === '' || form.yearOfStudy === '') {
+    const errors = [];
+
+    // Check for individual fields missing
+    if (form.email === '') {
+      errors.push({ field: 'email', message: 'Email is missing.' });
+    } else {
+
+      if (form.email.includes(' ')) {
+        errors.push({ field: 'email', message: 'Spacing is not allowed in the email.' });
+      }
+
+      // Check maximum characters for email
+      if (form.email.length > 50) {
+        errors.push({ field: 'email', message: 'Email must be at most 50 characters.' });
+      }
+
+      // Check if email does not contain '@'
+      if (!form.email.includes('@')) {
+        errors.push({ field: 'email', message: 'Email must contain @.' });
+      } else {
+        // Check if there are characters after '@' and ensure the entire email has no spaces
+        const afterAtMatch = form.email.match(/@(.+)/);
+        const afterAt = afterAtMatch ? afterAtMatch[1] : null;
+
+        if (!afterAt) {
+          errors.push({ field: 'email', message: 'Missing characters after @.' });
+        }
+      }
+
+    }
+
+    if (form.name === '') {
+      errors.push({ field: 'name', message: 'Name is missing.' });
+    } else {
+      // Check maximum characters for name
+      if (form.name.length > 50) {
+        errors.push({ field: 'name', message: 'Name must be at most 50 characters.' });
+      }
+    }
+
+    if (form.instrument === '') {
+      errors.push({ field: 'instrument', message: 'Instrument is missing.' });
+    }
+
+    if (form.yearOfStudy === '') {
+      errors.push({ field: 'yearOfStudy', message: 'Year of study is missing.' });
+    }
+
+
+    // Update validation errors state with accumulated errors
+    setValidationErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      errors.forEach((error) => {
+        newErrors[error.field] = error.message;
+      });
+      return newErrors;
+    });
+
+    // If there are errors, prevent form submission
+    if (errors.length > 0) {
       return;
     }
+
     try {
       const id = memberID;
 
@@ -93,13 +159,18 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
 
       if (data.message == "Email Already Exists") {
 
-        toast({
-          title: 'Failed to Update Member',
-          description: "Email Already in Use!",
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
+        errors.push({ field: 'email', message: 'Email already in use.' });
+        // Update validation errors state with the error message
+        setValidationErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          errors.forEach((error) => {
+            newErrors[error.field] = error.message;
+          });
+          return newErrors;
+        });
+
+        // Return without closing the modal if there is an error
+        return;
 
       } else if (response.status === 200) {
         toast({
@@ -117,8 +188,6 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
 
     // Close the modal after successful submission
     onClose();
-
-    setIsSubmitted(false);
 
     // Calling the callback function passed from the parent component, this function will call handleModalClose function in
     // membersScreen.js to re-render the table showing the updated member.
@@ -142,8 +211,14 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
 
       // If the file extension is not in the allowedExtensions array
       if (!allowedExtensions.includes(fileExtension)) {
-        // Invalid file extension, show alert and reset the input and the avatar
-        window.alert('Only PNG, JPEG, and JPG files are allowed.');
+        // Invalid file extension, show Toast and reset the input and the avatar
+        toast({
+          title: 'Invalid File Format!',
+          description: "Only PNG, JPEG, and JPG Files are Allowed!",
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+        })
         selectedFileInput.value = ''; // Clear the file input
         // Update the form state to indicate no profile picture
         updateForm({ profilePic: null });
@@ -176,8 +251,11 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
           <ModalHeader fontWeight='bold' color='#996515' textAlign="center" gridColumn="1 / -1">
             Edit Member
           </ModalHeader>
-          <ModalCloseButton onClick={() => { onClose(); afterCloseCallback(); setIsSubmitted(false); }} />
-          <ModalBody className='add-modal-body'>
+          <ModalCloseButton onClick={() => { 
+            onClose(); 
+            afterCloseCallback();
+            setValidationErrors({ email: "", name: "", instrument: "", yearOfStudy: "" });}} />
+          <ModalBody className='edit-modal-body'>
 
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
               {/* Left column for image */}
@@ -188,48 +266,64 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
 
               {/* Right column for FormControls */}
               <VStack spacing={4} align="start" maxWidth='400px'>
-                <FormControl isInvalid={isSubmitted && form.email === ''}>
+                <FormControl isInvalid={validationErrors.email !== ''}>
                   <FormLabel color='#996515'>Email</FormLabel>
-                  <Input type='email' ref={initialRef} focusBorderColor='#996515'
+                  <Input type='text' ref={initialRef} focusBorderColor='#996515'
                     value={form.email}
-                    onChange={(e) => updateForm({ email: e.target.value })} />
-                  <FormErrorMessage>Email is missing.</FormErrorMessage>
+                    onChange={(e) => {
+                      updateForm({ email: e.target.value })
+                      // Clear the validation error when the user starts typing
+                      setValidationErrors((prevErrors) => ({ ...prevErrors, email: '' }));
+                    }} />
+                  <FormErrorMessage>{validationErrors.email}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isInvalid={isSubmitted && form.name === ''}>
+                <FormControl isInvalid={validationErrors.name !== ''}>
                   <FormLabel color='#996515' >Name</FormLabel>
                   <Input focusBorderColor='#996515'
                     value={form.name}
-                    onChange={(e) => updateForm({ name: e.target.value })} />
-                  <FormErrorMessage>Name is missing.</FormErrorMessage>
+                    onChange={(e) => {
+                      updateForm({ name: e.target.value })
+                      // Clear the validation error when the user starts typing
+                      setValidationErrors((prevErrors) => ({ ...prevErrors, name: '' }));
+                    }} />
+                  <FormErrorMessage>{validationErrors.name}</FormErrorMessage>
                 </FormControl>
 
                 {/* Instrument and Year of Study in a row */}
                 <HStack spacing={4} maxWidth='400px'>
-                  <FormControl isInvalid={isSubmitted && form.instrument === ''}>
+                  <FormControl isInvalid={validationErrors.instrument !== ''}>
                     <FormLabel color='#996515' >Instrument</FormLabel>
                     <Select placeholder='Select Instrument' focusBorderColor='#996515'
                       value={form.instrument}
-                      onChange={(e) => updateForm({ instrument: e.target.value })}>
+                      onChange={(e) => {
+                        updateForm({ instrument: e.target.value })
+                         // Clear the validation error when the user starts typing
+                         setValidationErrors((prevErrors) => ({ ...prevErrors, instrument: '' }));
+                      }}>
                       <option value='Trumpet'>Trumpet</option>
                       <option value='Trombone'>Trombone</option>
                       <option value='Saxophone'>Saxophone</option>
                       <option value='French Horn'>French Horn</option>
                       <option value='Tuba'>Tuba</option>
                     </Select>
-                    <FormErrorMessage>Instrument is missing.</FormErrorMessage>
+                    <FormErrorMessage>{validationErrors.instrument}</FormErrorMessage>
                   </FormControl>
 
-                  <FormControl isInvalid={isSubmitted && form.yearOfStudy === ''}>
+                  <FormControl isInvalid={validationErrors.yearOfStudy !== ''}>
                     <FormLabel color='#996515' >Year of Study</FormLabel>
                     <Select placeholder='Select Year' focusBorderColor='#996515'
                       value={form.yearOfStudy}
-                      onChange={(e) => updateForm({ yearOfStudy: e.target.value })}>
+                      onChange={(e) => {
+                        updateForm({ yearOfStudy: e.target.value })
+                        // Clear the validation error when the user starts typing
+                        setValidationErrors((prevErrors) => ({ ...prevErrors, yearOfStudy: '' }));
+                      }}>
                       <option value={1}>1</option>
                       <option value={2}>2</option>
                       <option value={3}>3</option>
                     </Select>
-                    <FormErrorMessage>Year of study is missing.</FormErrorMessage>
+                    <FormErrorMessage>{validationErrors.yearOfStudy}</FormErrorMessage>
                   </FormControl>
                 </HStack>
               </VStack>
@@ -244,7 +338,11 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
                 {
                   color: 'white'
                 }
-              } onClick={() => { onClose(); afterCloseCallback(); setIsSubmitted(false); }}>
+              } onClick={() => { 
+                onClose(); 
+                afterCloseCallback();
+                setValidationErrors({ email: "", name: "", instrument: "", yearOfStudy: "" });
+                }}>
               Cancel
             </Button>
             <Button type='submit' backgroundColor='rgba(153, 101, 21, 1);'

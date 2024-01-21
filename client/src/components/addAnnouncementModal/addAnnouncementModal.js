@@ -29,7 +29,10 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
     description: "",
   });
 
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [validationErrors, setValidationErrors] = useState({
+    title: '',
+    description: ''
+  });
 
   const toast = useToast();
 
@@ -43,13 +46,45 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
   //This function will handle the submission
   async function onSubmit(e) {
     e.preventDefault();
-    setIsSubmitted(true);
 
-    if (form.title === '' || form.description === '') {
-      return;
+    const errors = [];
 
+    // Check for individual fields missing
+    if (form.title === '') {
+      errors.push({ field: 'title', message: 'Title is missing.' });
+    } else {
+
+      // Check maximum characters for title
+      if (form.title.length > 80) {
+        errors.push({ field: 'title', message: 'Title must be at most 80 characters.' });
+      }    
     }
 
+     // Check for individual fields missing
+     if (form.description === '') {
+      errors.push({ field: 'description', message: 'Description is missing.' });
+    } else {
+
+      // Check maximum characters for description
+      if (form.description.length > 350) {
+        errors.push({ field: 'description', message: 'Description must be at most 350 characters.' });
+      }    
+    }
+
+    // Update validation errors state with accumulated errors
+    setValidationErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      errors.forEach((error) => {
+        newErrors[error.field] = error.message;
+      });
+      return newErrors;
+    });
+
+    // If there are errors, prevent form submission
+    if (errors.length > 0) {
+      return;
+    }
+ 
     try {
       //When a post request is sent to the create url, we'll add a new announcement to the database
       const newAnnouncement = { ...form };
@@ -80,7 +115,6 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
     onClose();
 
     setForm({ title: "", description: "" });
-    setIsSubmitted(false);
 
     // Calling the callback function passed from the parent component, this function will call handleModalClose function in
     // announcementScreen.js to re-render the announcement container showing the added announcement.
@@ -98,25 +132,37 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
       <ModalContent className='add-announcement-modal-content'>
         <form onSubmit={onSubmit}>
           <ModalHeader fontWeight='bold' color='#996515' textAlign="center">Add New Announcement</ModalHeader>
-          <ModalCloseButton onClick={() => { onClose(); setForm({ title: "", description: "" });  afterCloseCallback(); setIsSubmitted(false); }} />
+          <ModalCloseButton onClick={() => { onClose(); 
+            setForm({ title: "", description: "" });  
+            afterCloseCallback(); 
+            setValidationErrors({ title: "", description: ""});
+          }} />
           <ModalBody pb={6}>
-            <FormControl isInvalid={isSubmitted && form.title === ''}>
-              <FormLabel color='#996515'>Title</FormLabel>
+            <FormControl isInvalid={validationErrors.title !== ''}>
+              <FormLabel color='#996515'>Title *</FormLabel>
               <Input ref={initialRef} placeholder='Enter Title'
                 focusBorderColor='#996515'
                 value={form.title}
-                onChange={(e) => updateForm({ title: e.target.value })} />
-              <FormErrorMessage>Title is missing.</FormErrorMessage>
+                onChange={(e) => {
+                  updateForm({ title: e.target.value })
+                  // Clear the validation error when the user starts typing
+                  setValidationErrors((prevErrors) => ({ ...prevErrors, title: '' }));
+                }} />
+              <FormErrorMessage>{validationErrors.title}</FormErrorMessage>
             </FormControl>
 
-            <FormControl mt={4} isInvalid={isSubmitted && form.description === ''}>
-              <FormLabel color='#996515'>Description</FormLabel>
+            <FormControl mt={4} isInvalid={validationErrors.description !== ''}>
+              <FormLabel color='#996515'>Description *</FormLabel>
               <Textarea placeholder='Enter Description'
                 focusBorderColor='#996515'
                 height='200px'
                 value={form.description}
-                onChange={(e) => updateForm({ description: e.target.value })}></Textarea>
-              <FormErrorMessage>Description is missing.</FormErrorMessage>
+                onChange={(e) => {
+                  updateForm({ description: e.target.value })
+                  // Clear the validation error when the user starts typing
+                  setValidationErrors((prevErrors) => ({ ...prevErrors, description: '' }));
+                }}></Textarea>
+              <FormErrorMessage>{validationErrors.description}</FormErrorMessage>
             </FormControl>
 
           </ModalBody>
@@ -129,7 +175,12 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
                 {
                   color: 'white'
                 }
-              } onClick={() => { onClose(); setForm({ title: "", description: ""}); afterCloseCallback(); setIsSubmitted(false); }}>
+              } onClick={() => { 
+                onClose(); 
+                setForm({ title: "", description: ""}); 
+                afterCloseCallback();
+                setValidationErrors({ title: "", description: ""});
+               }}>
               Cancel
             </Button>
             <Button type='submit' backgroundColor='rgba(153, 101, 21, 1);'
