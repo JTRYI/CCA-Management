@@ -14,25 +14,49 @@ function LoginForm() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const [selectedRole, setSelectedRole] = useState('false'); // Default value 'false' for Member
   const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
 
-
-  const handleInputChange = (e) => setEmail(e.target.value)
-  const handlePasswordInputChange = (e) => setPassword(e.target.value)
-
-  const isError = isSubmitted && email === '';
-  const isPasswordError = isSubmitted && password === '';
+  const [validationErrors, setValidationErrors] = useState({
+    email: '',
+    password: ''
+  });
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitted(true);
 
-    if (email === '' || password === '') {
+    const errors = [];
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Check for individual fields missing
+    if (email === '') {
+      errors.push({ field: 'email', message: 'Email is missing.' });
+    } else if (!emailRegex.test(email)) {
+      errors.push({ field: 'email', message: 'Invalid email format.' });
+    } else if (email.length > 50) {
+      errors.push({ field: 'email', message: 'Email must be at most 50 characters.' });
+    }
+
+    if (password === '') {
+      errors.push({ field: 'password', message: 'Password is missing.' })
+    } 
+
+    // Update validation errors state with accumulated errors
+    setValidationErrors((prevErrors) => {
+      const newErrors = { ...prevErrors };
+      errors.forEach((error) => {
+        newErrors[error.field] = error.message;
+      });
+      return newErrors;
+    });
+
+    // If there are errors, prevent form submission
+    if (errors.length > 0) {
       return;
     }
 
@@ -64,7 +88,16 @@ function LoginForm() {
         // Handle login failure
         setEmail('');
         setPassword('');
-        alert("Invalid Credentials!")
+        errors.push({ field: 'email', message: 'Invalid email or password.' });
+        errors.push({ field: 'password', message: 'Invalid email or password.' });
+        // Update validation errors state with the error message
+        setValidationErrors((prevErrors) => {
+          const newErrors = { ...prevErrors };
+          errors.forEach((error) => {
+            newErrors[error.field] = error.message;
+          });
+          return newErrors;
+        });
       }
 
     } catch (error) {
@@ -90,23 +123,35 @@ function LoginForm() {
             <Radio value='true'>Administrator</Radio>
           </Stack>
         </RadioGroup>
-        <FormControl className='email-form' isInvalid={isError}>
+        <FormControl className='email-form' isInvalid={validationErrors.email !== ''}>
           <FormLabel color={'white'} >Email</FormLabel>
-          <Input type='email' width="90%" textColor={'white'} focusBorderColor='white' value={email} onChange={handleInputChange} />
-          <FormErrorMessage>Email is required.</FormErrorMessage>
+          <Input type='text' width="90%" textColor={'white'} focusBorderColor='white' value={email}
+            onChange={
+              (e) => {
+                setEmail(e.target.value);
+                // Clear the validation error when the user starts typing
+                setValidationErrors((prevErrors) => ({ ...prevErrors, email: '' }));
+              }} />
+          <FormErrorMessage>{validationErrors.email}</FormErrorMessage>
         </FormControl>
 
-        <FormControl className='password-form' isInvalid={isPasswordError}>
+        <FormControl className='password-form' isInvalid={validationErrors.password !== ''}>
           <FormLabel color={'white'} >Password</FormLabel>
           <InputGroup>
-            <Input type={show ? 'text' : 'password'} width="90%" textColor={'white'} focusBorderColor='white' value={password} onChange={handlePasswordInputChange} />
+            <Input type={show ? 'text' : 'password'} width="90%" textColor={'white'} focusBorderColor='white' value={password} 
+            onChange={
+              (e) => {
+                setPassword(e.target.value);
+                // Clear the validation error when the user starts typing
+                setValidationErrors((prevErrors) => ({ ...prevErrors, password: '' }));
+              }} />
             <InputRightElement width='4.5rem'>
-            <Button h='1.75rem' size='sm' onClick={handleClick} style={{transform: 'translateX(-45px)', textDecoration: 'none'}} variant='link'> {/*setting variant to "link" for a simple text button*/}
-              {show ? 'Hide' : 'Show'}
-            </Button>
-          </InputRightElement>
+              <Button h='1.75rem' size='sm' onClick={handleClick} style={{ transform: 'translateX(-45px)', textDecoration: 'none' }} variant='link'> {/*setting variant to "link" for a simple text button*/}
+                {show ? 'Hide' : 'Show'}
+              </Button>
+            </InputRightElement>
           </InputGroup>
-          <FormErrorMessage>Password is required.</FormErrorMessage>
+          <FormErrorMessage>{validationErrors.password}</FormErrorMessage>
         </FormControl>
 
         <Button type='submit' className='login-btn' color={'white'} backgroundColor="#996515" borderRadius="30" width="30%"

@@ -74,33 +74,15 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
 
     const errors = [];
 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     // Check for individual fields missing
     if (form.email === '') {
       errors.push({ field: 'email', message: 'Email is missing.' });
-    } else {
-
-      if (form.email.includes(' ')) {
-        errors.push({ field: 'email', message: 'Spacing is not allowed in the email.' });
-      }
-
-      // Check maximum characters for email
-      if (form.email.length > 50) {
-        errors.push({ field: 'email', message: 'Email must be at most 50 characters.' });
-      }
-
-      // Check if email does not contain '@'
-      if (!form.email.includes('@')) {
-        errors.push({ field: 'email', message: 'Email must contain @.' });
-      } else {
-        // Check if there are characters after '@' and ensure the entire email has no spaces
-        const afterAtMatch = form.email.match(/@(.+)/);
-        const afterAt = afterAtMatch ? afterAtMatch[1] : null;
-
-        if (!afterAt) {
-          errors.push({ field: 'email', message: 'Missing characters after @.' });
-        }
-      }
-
+    } else if (!emailRegex.test(form.email)) {
+      errors.push({ field: 'email', message: 'Invalid email format.' });
+    } else if (form.email.length > 50) {
+      errors.push({ field: 'email', message: 'Email must be at most 50 characters.' });
     }
 
     if (form.name === '') {
@@ -251,10 +233,11 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
           <ModalHeader fontWeight='bold' color='#996515' textAlign="center" gridColumn="1 / -1">
             Edit Member
           </ModalHeader>
-          <ModalCloseButton onClick={() => { 
-            onClose(); 
+          <ModalCloseButton onClick={() => {
+            onClose();
             afterCloseCallback();
-            setValidationErrors({ email: "", name: "", instrument: "", yearOfStudy: "" });}} />
+            setValidationErrors({ email: "", name: "", instrument: "", yearOfStudy: "" });
+          }} />
           <ModalBody className='edit-modal-body'>
 
             <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
@@ -298,8 +281,8 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
                       value={form.instrument}
                       onChange={(e) => {
                         updateForm({ instrument: e.target.value })
-                         // Clear the validation error when the user starts typing
-                         setValidationErrors((prevErrors) => ({ ...prevErrors, instrument: '' }));
+                        // Clear the validation error when the user starts typing
+                        setValidationErrors((prevErrors) => ({ ...prevErrors, instrument: '' }));
                       }}>
                       <option value='Trumpet'>Trumpet</option>
                       <option value='Trombone'>Trombone</option>
@@ -338,11 +321,11 @@ export default function EditModal({ isOpen, onOpen, onClose, afterCloseCallback,
                 {
                   color: 'white'
                 }
-              } onClick={() => { 
-                onClose(); 
+              } onClick={() => {
+                onClose();
                 afterCloseCallback();
                 setValidationErrors({ email: "", name: "", instrument: "", yearOfStudy: "" });
-                }}>
+              }}>
               Cancel
             </Button>
             <Button type='submit' backgroundColor='rgba(153, 101, 21, 1);'

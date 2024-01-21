@@ -111,36 +111,18 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
   //This function will handle the submission
   async function onSubmit(e) {
     e.preventDefault();
-  
+
     const errors = [];
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // Check for individual fields missing
     if (form.email === '') {
       errors.push({ field: 'email', message: 'Email is missing.' });
-    } else {
-
-      if (form.email.includes(' ')) {
-        errors.push({ field: 'email', message: 'Spacing is not allowed in the email.' });
-      }
-
-      // Check maximum characters for email
-      if (form.email.length > 50) {
-        errors.push({ field: 'email', message: 'Email must be at most 50 characters.' });
-      }
-
-      // Check if email does not contain '@'
-      if (!form.email.includes('@')) {
-        errors.push({ field: 'email', message: 'Email must contain @.' });
-      } else {
-        // Check if there are characters after '@' and ensure the entire email has no spaces
-        const afterAtMatch = form.email.match(/@(.+)/);
-        const afterAt = afterAtMatch ? afterAtMatch[1] : null;
-
-        if (!afterAt) {
-          errors.push({ field: 'email', message: 'Missing characters after @.' });
-        }
-      }
-
+    } else if (!emailRegex.test(form.email)) {
+      errors.push({ field: 'email', message: 'Invalid email format.' });
+    } else if (form.email.length > 50) {
+      errors.push({ field: 'email', message: 'Email must be at most 50 characters.' });
     }
 
     if (form.password === '') {
@@ -162,7 +144,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
       }
     }
 
-    if (confirmPassword !== form.password || confirmPassword == ''){
+    if (confirmPassword !== form.password || confirmPassword == '') {
       errors.push({ field: 'confirmPassword', message: 'Passwords do not match.' });
     }
 
