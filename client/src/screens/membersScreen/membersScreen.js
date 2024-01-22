@@ -1,6 +1,6 @@
 import React from 'react';
 import './membersScreen.css';
-import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar, Menu, MenuList, MenuItem, MenuButton, IconButton, Icon, MenuItemOption, MenuOptionGroup, Box } from '@chakra-ui/react';
+import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar, Menu, MenuList, MenuItem, MenuButton, IconButton, Icon, MenuItemOption, MenuOptionGroup, Box, Progress } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import AddModal from '../../components/addModal/addModal';
@@ -137,6 +137,10 @@ function MembersScreen() {
   const [isInstrumentSorted, setIsInstrumentSorted] = useState(false);
   const [isDateJoinedSorted, setIsDateJoinedSorted] = useState(false);
 
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const [isFetching, setIsFetching] = useState(true);
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [updateTrigger, setUpdateTrigger] = useState(false);
   const toast = useToast();
@@ -147,19 +151,51 @@ function MembersScreen() {
   };
 
   //This method fetches the members from the database
+  // useEffect(() => {
+  //   async function getMembers() {
+  //     const response = await fetch(`http://localhost:5050/members/`);
+
+  //     if (!response.ok) {
+  //       const message = `Ah error occured: ${response.statusTest}`;
+  //       window.alert(message);
+  //       return;
+  //     }
+
+  //     const members = await response.json();
+  //     setMembers(members);
+  //     setSelectedFilter('all');
+  //   }
+
+  //   getMembers();
+
+  //   return;
+  // }, [updateTrigger]);
+
   useEffect(() => {
+    // This effect will run whenever updateTrigger changes
     async function getMembers() {
-      const response = await fetch(`http://localhost:5050/members/`);
+      try {
+        setIsFetching(true); // Setting isFetching to true when starting the data fetching
 
-      if (!response.ok) {
-        const message = `Ah error occured: ${response.statusTest}`;
-        window.alert(message);
-        return;
+        // Simulate a 300 millisecond delay using setTimeout, 1000 ms is 1s
+        await new Promise(resolve => setTimeout(resolve, 300));
+
+        const response = await fetch(`http://localhost:5050/members/`);
+
+        if (!response.ok) {
+          const message = `Ah error occurred: ${response.statusText}`;
+          window.alert(message);
+          return;
+        }
+
+        const fetchedMembers = await response.json();
+        setMembers(fetchedMembers);
+        setSelectedFilter('all');
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsFetching(false); // Setting isFetching to false when data fetching is complete
       }
-
-      const members = await response.json();
-      setMembers(members);
-      setSelectedFilter('all');
     }
 
     getMembers();
@@ -274,7 +310,9 @@ function MembersScreen() {
   // This method will map out the members on the table based on the selected filter
   function filteredMemberList() {
 
-    return filteredMembers.map((member) => (
+    const filteredMembersByName = filteredMembers.filter(member => member.name.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    return filteredMembersByName.map((member) => (
       <Member
         member={member}
         key={member._id}
@@ -305,8 +343,7 @@ function MembersScreen() {
                 borderColor: 'black'
               }
             }
-
-
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputRightElement>
             <img src='icons/magnifying-glass-solid.svg'></img>
@@ -331,8 +368,8 @@ function MembersScreen() {
             </Box>
 
             <Button rightIcon={<FcClearFilters />} colorScheme='orange' variant='ghost' height={8} margin={1} onClick={handleCancelSortFilter}>
-            Clear
-          </Button>
+              Clear
+            </Button>
 
           </div>
           <Button className='right-side-header' backgroundColor='rgba(153, 101, 21, 0.5);'
@@ -365,6 +402,11 @@ function MembersScreen() {
                 <Th color='#996515'>Actions</Th>
               </Tr>
             </Thead>
+            <Tr>
+              <Td colSpan={4} style={{ padding: 0 }}>
+                <Progress size='xs' colorScheme='orange' style={{ display: isFetching ? 'block' : 'none' }} isIndeterminate />
+              </Td>
+            </Tr>
             <Tbody>{filteredMemberList()}</Tbody>
           </Table>
         </TableContainer>
