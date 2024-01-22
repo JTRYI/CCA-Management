@@ -55,6 +55,17 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
     setIsDragging(false);
     const droppedFiles = event.dataTransfer.files;
 
+    if (droppedFiles.length !== 1) {
+      toast({
+        title: 'Invalid File Count!',
+        description: 'Please drop only one file.',
+        status: 'warning',
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
     if (droppedFiles.length > 0) {
       const imageFile = droppedFiles[0];
 

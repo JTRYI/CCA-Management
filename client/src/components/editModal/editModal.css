@@ -4,3 +4,42 @@
 .edit-modal-content{
     font-family: 'Lato';
 }
+
+/* .card {
+    padding: 10px;
+    box-shadow: 0 0 5px #ffdfdf;
+    border-radius: 5px;
+    overflow: hidden;
+} */
+
+.card .drag-area{
+    width: 250px;
+    height: 150px;
+    border-radius: 5px;
+    border: 2px dashed #d3d3d3;
+    color: #996515;
+    background: #f4f3f9;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    -webkit-user-select: none;
+    margin-top: 10px;
+}
+
+.card .select{
+    color: rgba(153, 101, 21, 0.7);
+    margin-left: 5px;
+    cursor: pointer;
+    transition: 0.4s;
+}
+
+.card .select:hover{
+    opacity: 0.6;
+}
+
+.card input,
+.card .drag-area .on-drop,
+.card .drag-area.dragover .visible {
+    display: none;
+}
