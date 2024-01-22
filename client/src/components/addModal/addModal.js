@@ -14,7 +14,8 @@ import { FormControl, FormLabel, FormErrorMessage, Input, Select, InputGroup, In
 import { Grid, VStack, HStack } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react'
 import { Avatar } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
+import { ImCross } from "react-icons/im";
 
 
 function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
@@ -29,6 +30,60 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const toast = useToast();
+
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  function selectFiles() {
+    fileInputRef.current.click();
+  }
+
+  function onDragOver(event) {
+    event.preventDefault();
+    setIsDragging(true);
+    event.dataTransfer.dropEffect = "copy";
+  }
+
+  function onDragLeave(event) {
+    event.preventDefault();
+    setIsDragging(false);
+
+  }
+
+  function onDrop(event) {
+    event.preventDefault();
+    setIsDragging(false);
+    const droppedFiles = event.dataTransfer.files;
+
+    if (droppedFiles.length > 0) {
+      const imageFile = droppedFiles[0];
+
+      const allowedExtensions = ['png', 'jpeg', 'jpg'];
+      const fileExtension = imageFile.name.split('.').pop().toLowerCase();
+
+      if (!allowedExtensions.includes(fileExtension)) {
+        toast({
+          title: 'Invalid File Format!',
+          description: 'Only PNG, JPEG, and JPG Files are Allowed!',
+          status: 'warning',
+          duration: 5000,
+          isClosable: true,
+        });
+        // Reset any previous selected file and update the form state
+        updateForm({ profilePic: null });
+        document.getElementById('target').src = 'https://bit.ly/broken-link';
+        return;
+      }
+
+      const fileReader = new FileReader();
+      fileReader.onload = function (fileLoadedEvent) {
+        const picture = fileLoadedEvent.target.result;
+        updateForm({ profilePic: picture });
+        document.getElementById('target').src = picture;
+      };
+      fileReader.readAsDataURL(imageFile);
+    }
+  }
 
   function encode() {
     var selectedFileInput = document.getElementById("myinput");
@@ -77,6 +132,13 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
       // Read the file as a data URL (base64-encoded)
       fileReader.readAsDataURL(imageFile);
     }
+  }
+
+  function removeImage() {
+    // Update the form state to indicate no profile picture
+    updateForm({ profilePic: null });
+    // Setting the source of the avatar image to a placeholder or broken link
+    document.getElementById("target").src = 'https://bit.ly/broken-link';
   }
 
 
@@ -250,12 +312,37 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
             setValidationErrors({ email: "", password: "", confirmPassword: "", name: "", instrument: "", yearOfStudy: "" });
           }} />
           <ModalBody className='add-modal-body' overflowY='auto' maxHeight='62vh'>
-
-            <Grid templateColumns="225px 1fr" gap={1} alignItems="center">
+            {/*Image Column will take up 1 fraction of modal space while All the input fields will also take up 1 fraction of the modal space for template columns */}
+            <Grid templateColumns="1fr 1fr" gap={4} alignItems="center">
               {/* Left column for image */}
-              <div className='add-image' >
-                <Avatar key={form.profilePic || 'default-key'} size='2xl' bg='yellow.400' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
-                <input id="myinput" type="file" onChange={encode} style={{ fontSize: '12px', color: '#996515', paddingTop: '20%' }}></input>
+              <div className='upload-image-container' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+                <div className='add-image' style={{ marginBottom: '20px' }}>
+                  <Avatar key={form.profilePic || 'default-key'} size='2xl' bg='yellow.400' name={form.name} src={form.profilePic == null ? 'https://bit.ly/broken-link' : form.profilePic} id="target" />
+                </div>
+
+                <div className='card'>
+                  <div className='drag-area' onDragOver={onDragOver} onDragLeave={onDragLeave} onDrop={onDrop}>
+                    {isDragging ? (
+                      <span className='select'> Drop Images Here</span>
+                    ) : (
+                      <p style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        Drag & Drop Image Here or
+                        <span className='select' role='button' onClick={selectFiles}> Browse </span>
+                      </p>
+
+                    )}
+                    <input id="myinput" type="file" onChange={encode} ref={fileInputRef} style={{ fontSize: '12px', color: '#996515', paddingTop: '20%' }}></input>
+                  </div>
+                </div>
+
+                <Button leftIcon={<ImCross />} style={{ width: '250px', marginTop: '10px' }}
+                  _hover={
+                    {
+                      backgroundColor: 'red'
+                    }
+                  }
+                  onClick={removeImage}>Clear Image</Button>
               </div>
 
               {/* Right column for FormControls */}
