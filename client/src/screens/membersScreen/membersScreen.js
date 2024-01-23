@@ -1,6 +1,6 @@
 import React from 'react';
 import './membersScreen.css';
-import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar, Menu, MenuList, MenuItem, MenuButton, IconButton, Icon, MenuItemOption, MenuOptionGroup, Box, Progress } from '@chakra-ui/react';
+import { Button, Input, InputGroup, InputRightElement, Table, TableContainer, Td, Tr, Thead, Th, Tbody, Avatar, Menu, MenuList, MenuItem, MenuButton, IconButton, Icon, MenuItemOption, MenuOptionGroup, Box, Progress, Text } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import { useDisclosure, useToast } from '@chakra-ui/react';
 import AddModal from '../../components/addModal/addModal';
@@ -12,6 +12,7 @@ import { BsFunnel } from "react-icons/bs";
 import { FaSortAlphaUp } from "react-icons/fa";
 import { FaSortNumericDownAlt } from "react-icons/fa";
 import { FcClearFilters } from "react-icons/fc";
+import { RxCross2 } from "react-icons/rx";
 
 import EditModal from '../../components/editModal/editModal';
 import {
@@ -151,26 +152,6 @@ function MembersScreen() {
   };
 
   //This method fetches the members from the database
-  // useEffect(() => {
-  //   async function getMembers() {
-  //     const response = await fetch(`http://localhost:5050/members/`);
-
-  //     if (!response.ok) {
-  //       const message = `Ah error occured: ${response.statusTest}`;
-  //       window.alert(message);
-  //       return;
-  //     }
-
-  //     const members = await response.json();
-  //     setMembers(members);
-  //     setSelectedFilter('all');
-  //   }
-
-  //   getMembers();
-
-  //   return;
-  // }, [updateTrigger]);
-
   useEffect(() => {
     // This effect will run whenever updateTrigger changes
     async function getMembers() {
@@ -290,7 +271,6 @@ function MembersScreen() {
   };
 
 
-
   useEffect(() => {
     // This effect will run whenever selectedFilter or members change
     let updatedFilteredMembers = members;
@@ -343,16 +323,21 @@ function MembersScreen() {
                 borderColor: 'black'
               }
             }
+            value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
           <InputRightElement>
-            <img src='icons/magnifying-glass-solid.svg'></img>
+          {searchQuery.length > 0 ? (
+            <RxCross2 onClick={() => setSearchQuery('')} style={{ cursor: 'pointer', marginRight: '20px'}} />
+          ) : (
+            <img src='icons/magnifying-glass-solid.svg' alt='search-icon' />
+          )}
           </InputRightElement>
         </InputGroup>
 
         <div className='top-header'>
           <div className='left-side-headers'>
-            <h1>{filteredMembers.length} Members</h1>
+            <h1>{filteredMemberList().length} Members</h1>
             <Box key={selectedFilter} style={{ zIndex: 2 }}>
               <Menu>
                 <MenuButton as={IconButton} variant='' icon={<BsFunnel />} style={{ fontSize: '20px', paddingLeft: '10%', marginTop: '2px' }} />
@@ -403,11 +388,11 @@ function MembersScreen() {
               </Tr>
             </Thead>
             <Tr>
-              <Td colSpan={4} style={{ padding: 0 }}>
-                <Progress size='xs' colorScheme='orange' style={{ display: isFetching ? 'block' : 'none' }} isIndeterminate />
+              <Td colSpan={4} style={{ padding: 0, position: 'sticky', top: '70.4px', zIndex: 1 }}>
+                <Progress size='xs' colorScheme='orange' style={{ display: isFetching ? 'block' : 'none'}} isIndeterminate />
               </Td>
             </Tr>
-            <Tbody>{filteredMemberList()}</Tbody>
+            <Tbody>{filteredMemberList().length > 0 ? filteredMemberList() : <Box paddingStart={20} marginTop = '20px'><Text fontSize='lg' fontFamily='Lato'>No Results Found.</Text></Box>}</Tbody>
           </Table>
         </TableContainer>
       </div>

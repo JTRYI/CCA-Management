@@ -80,15 +80,18 @@ function EditAnnouncementModal({ isOpen, onClose, afterCloseCallback, announceme
       }
     }
 
-    // Check for individual fields missing
-    if (form.description === '') {
-      errors.push({ field: 'description', message: 'Description is missing.' });
-    } else {
+    // Calculate the number of newline characters in the description
+    const newlineCount = (form.description.match(/\n/g) || []).length;
 
+    // Check for individual fields missing
+    if (form.description.trim() === '') {
+      errors.push({ field: 'description', message: 'Description is missing.' });
+    } else if (newlineCount > 8) {
+      // Check if the description has more than 8 lines
+      errors.push({ field: 'description', message: 'Description must have at most 8 lines.' });
+    } else if (form.description.length > 350) {
       // Check maximum characters for description
-      if (form.description.length > 350) {
-        errors.push({ field: 'description', message: 'Description must be at most 350 characters.' });
-      }
+      errors.push({ field: 'description', message: 'Description must be at most 350 characters.' });
     }
 
     // Update validation errors state with accumulated errors
@@ -180,7 +183,7 @@ function EditAnnouncementModal({ isOpen, onClose, afterCloseCallback, announceme
 
             <FormControl mt={4} isInvalid={validationErrors.description !== ''}>
               <FormLabel color='#996515'>Description</FormLabel>
-              <Textarea placeholder='Enter Description'
+              <Textarea placeholder='Enter Description (Max 350 Characters & 8 Lines)'
                 focusBorderColor='#996515'
                 height='200px'
                 value={form.description}
@@ -202,11 +205,11 @@ function EditAnnouncementModal({ isOpen, onClose, afterCloseCallback, announceme
                 {
                   color: 'white'
                 }
-              } onClick={() => { 
-                onClose(); 
-                setForm({ title: "", description: "" }); 
+              } onClick={() => {
+                onClose();
+                setForm({ title: "", description: "" });
                 afterCloseCallback();
-                setValidationErrors({ title: "", description: ""});
+                setValidationErrors({ title: "", description: "" });
               }}>
               Cancel
             </Button>

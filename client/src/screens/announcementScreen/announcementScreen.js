@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import './announcementScreen.css';
-import { Button, useDisclosure, useToast } from '@chakra-ui/react';
+import { Button, Text, useDisclosure, useToast } from '@chakra-ui/react';
 import { ImPencil } from "react-icons/im";
 import { ImBin } from "react-icons/im";
 import AddAnnouncementModal from '../../components/addAnnouncementModal/addAnnouncementModal';
@@ -71,7 +71,7 @@ const Announcement = (props) => {
               </AlertDialogOverlay>
             </AlertDialog>
         </div>
-        <p>{props.announcement.description}</p>
+        <p style={{whiteSpace: 'pre-line'}}>{props.announcement.description}</p>
       </div>
     </div>
   );
@@ -169,7 +169,7 @@ function AnnouncementScreen() {
       </div>
 
       <div className='announcements-container' style={{ marginTop: '30px' }}>
-        {announcementList()}
+        {announcementList().length > 0 ? announcementList() : <Text fontSize='xl'>No Announcements Yet.</Text>}
       </div>
     </div>
   );

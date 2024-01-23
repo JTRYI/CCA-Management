@@ -57,18 +57,21 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
       // Check maximum characters for title
       if (form.title.length > 80) {
         errors.push({ field: 'title', message: 'Title must be at most 80 characters.' });
-      }    
+      }
     }
 
-     // Check for individual fields missing
-     if (form.description === '') {
-      errors.push({ field: 'description', message: 'Description is missing.' });
-    } else {
+    // Calculate the number of newline characters in the description
+    const newlineCount = (form.description.match(/\n/g) || []).length;
 
+    // Check for individual fields missing
+    if (form.description.trim() === '') {
+      errors.push({ field: 'description', message: 'Description is missing.' });
+    } else if (newlineCount > 8) {
+      // Check if the description has more than 8 lines
+      errors.push({ field: 'description', message: 'Description must have at most 8 lines.' });
+    } else if (form.description.length > 350) {
       // Check maximum characters for description
-      if (form.description.length > 350) {
-        errors.push({ field: 'description', message: 'Description must be at most 350 characters.' });
-      }    
+      errors.push({ field: 'description', message: 'Description must be at most 350 characters.' });
     }
 
     // Update validation errors state with accumulated errors
@@ -84,7 +87,7 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
     if (errors.length > 0) {
       return;
     }
- 
+
     try {
       //When a post request is sent to the create url, we'll add a new announcement to the database
       const newAnnouncement = { ...form };
@@ -132,10 +135,11 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
       <ModalContent className='add-announcement-modal-content'>
         <form onSubmit={onSubmit}>
           <ModalHeader fontWeight='bold' color='#996515' textAlign="center">Add New Announcement</ModalHeader>
-          <ModalCloseButton onClick={() => { onClose(); 
-            setForm({ title: "", description: "" });  
-            afterCloseCallback(); 
-            setValidationErrors({ title: "", description: ""});
+          <ModalCloseButton onClick={() => {
+            onClose();
+            setForm({ title: "", description: "" });
+            afterCloseCallback();
+            setValidationErrors({ title: "", description: "" });
           }} />
           <ModalBody pb={6}>
             <FormControl isInvalid={validationErrors.title !== ''}>
@@ -153,7 +157,7 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
 
             <FormControl mt={4} isInvalid={validationErrors.description !== ''}>
               <FormLabel color='#996515'>Description *</FormLabel>
-              <Textarea placeholder='Enter Description'
+              <Textarea placeholder='Enter Description (Max 350 Characters & 8 Lines)'
                 focusBorderColor='#996515'
                 height='200px'
                 value={form.description}
@@ -161,7 +165,9 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
                   updateForm({ description: e.target.value })
                   // Clear the validation error when the user starts typing
                   setValidationErrors((prevErrors) => ({ ...prevErrors, description: '' }));
-                }}></Textarea>
+                }}
+
+              ></Textarea>
               <FormErrorMessage>{validationErrors.description}</FormErrorMessage>
             </FormControl>
 
@@ -175,12 +181,12 @@ function AddAnnouncementModal({ isOpen, onClose, afterCloseCallback }) {
                 {
                   color: 'white'
                 }
-              } onClick={() => { 
-                onClose(); 
-                setForm({ title: "", description: ""}); 
+              } onClick={() => {
+                onClose();
+                setForm({ title: "", description: "" });
                 afterCloseCallback();
-                setValidationErrors({ title: "", description: ""});
-               }}>
+                setValidationErrors({ title: "", description: "" });
+              }}>
               Cancel
             </Button>
             <Button type='submit' backgroundColor='rgba(153, 101, 21, 1);'
