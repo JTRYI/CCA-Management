@@ -37,12 +37,12 @@ router.post("/login", async (req, res) => {
 
             if (user.twoFA.enabled) {
 
-                if (!code) {
+                if (!code || code == '') {
                     return res.json({
                         codeRequested: true
                     })
                 }
-                
+
                 //2FA is enabled, check the provided code
                 const verified = authenticator.check(code, user.twoFA.secret);
 

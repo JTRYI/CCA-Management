@@ -1,6 +1,5 @@
 import React from 'react';
 import './homeScreen.css';
-import { useState } from 'react';
 import {
   Accordion,
   AccordionItem,
@@ -14,127 +13,20 @@ import {
   Button,
 
 } from '@chakra-ui/react'
-import { useToast } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
 
 
 function HomeScreen() {
 
-  const toast = useToast();
-
-  const token = sessionStorage.getItem('token');
-  const [qrImage, setQRImage] = useState('');
-
-  const [form, setForm] = useState({ code: "" });
-
-  async function getQR() {
-    try {
-      const response = await fetch(`http://localhost:5050/qrImage/${token}`);
-      const { qrImage, success } = await response.json();
-
-      if (success) {
-        setQRImage(qrImage);
-      } else {
-
-        toast({
-          title: 'Error Fetching QR Code',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-
-      }
-
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: error,
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    }
-
-  }
-
-  async function submit2FACode(e) {
-    e.preventDefault();
-
-    try {
-      const new2FACode = { ...form };
-
-      const response = await fetch(`http://localhost:5050/set2FA/${token}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(new2FACode),
-      })
-
-      const responseData = await response.json();
-      console.log(responseData);
-
-      if (responseData.message === "Invalid 2FA Code, Not Verified.") {
-        toast({
-          title: 'Invalid Code, Verification Failed!',
-          description: "Please enter a Valid Code!",
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-      } else {
-        toast({
-          title: '2FA Set Up Complete!',
-          status: 'success',
-          duration: 5000,
-          isClosable: true,
-        })
-      }
-    } catch (error) {
-      console.error(error);
-      // toast({
-      //   title: 'Error',
-      //   description: error,
-      //   status: 'error',
-      //   duration: 5000,
-      //   isClosable: true,
-      // })
-    }
-  }
+  
+  const navigate = useNavigate();
 
   return (
     <div className="homeScreen">
       <div className='home-banner' />
 
       <Accordion allowMultiple marginTop='20px'>
-        <AccordionItem border={'none'}>
-          <h2 style={{ color: 'red', fontWeight: 'bold' }}>
-            <AccordionButton>
-              <Box as="span" flex='1' textAlign='left' fontSize='20px' onClick={() => {
-                getQR();
-              }}>
-                Update/Enable 2FA
-              </Box>
-              <AccordionIcon />
-            </AccordionButton>
-          </h2>
-          <AccordionPanel pb={4}>
-
-            <Image
-              id='qrcode'
-              boxSize='150px'
-              objectFit='cover'
-              src={qrImage}
-            />
-
-            <form onSubmit={submit2FACode}>
-              <Input placeholder='Enter 2FA Code' onChange={(e) => {
-                setForm(prevForm => ({ ...prevForm, code: e.target.value }));
-              }}></Input>
-              <Button type='submit'>SET</Button>
-            </form>
-          </AccordionPanel>
-        </AccordionItem>
-
+        
         <AccordionItem border={'none'} >
           <h2 style={{ color: '#996515', fontWeight: 'bold' }}>
             <AccordionButton>
@@ -202,8 +94,16 @@ function HomeScreen() {
             </Text>
           </AccordionPanel>
         </AccordionItem>
-
       </Accordion>
+
+      <Button colorScheme='red' variant='ghost' marginTop='5px' 
+      fontSize='20px' 
+      color='red'
+      onClick={() => {
+        navigate('/enable2FA');
+      }}>
+        Update/Enable 2FA
+      </Button>
     </div>
   );
 };

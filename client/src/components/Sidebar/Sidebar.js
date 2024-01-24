@@ -114,7 +114,7 @@ function Sidebar() {
       </div>
       <div className='nav-footer'>
         <div className={isExpanded ? 'nav-details' : 'nav-details nav-details-NX'}>
-          <Avatar size='md' name={user.name} src={user.profilePic == null ? 'https://bit.ly/broken-link' : user.profilePic} style={{ margin: '0 15px' }} />
+          <Avatar size='md' bg='yellow.400' name={user.name} src={user.profilePic == null ? 'https://bit.ly/broken-link' : user.profilePic} style={{ margin: '0 15px' }} />
           <div className='nav-footer-info'>
             <p className='nav-footer-user-name'>{user.name}</p>
             <p className='nav-footer-user-role'>{user.isAdmin === true ? 'Administrator' : 'Member'}</p>

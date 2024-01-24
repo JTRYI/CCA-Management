@@ -7,7 +7,7 @@
     margin-top: 5%;
     margin-left: 60%;
     width: 480px;
-    height: 85vh;
+    height: auto;
     background-color: rgba(0, 0, 0, 0.4); /* Set opacity by adjusting the fourth parameter*/
     border-radius: 15px;
     backdrop-filter: blur(10px);
@@ -32,8 +32,8 @@
 
 .logoImage {
     background-image: url("../../images/band-logo.png");
-    width: 125px;
-    height: 125px;
+    width: 100px;
+    height: 100px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;
@@ -42,7 +42,7 @@
 
 .cca-name{
     padding-left: 5%;
-    font-size: 55px;
+    font-size: 50px;
     font-weight: bold;
     font-style: italic;
     color: #996515;
@@ -81,7 +81,8 @@
 }
 
 .login-btn{
-    margin-top: 15%;
+    margin-top: 10%;
     margin-left: 30%;
+    margin-bottom: 10%;
 }
 

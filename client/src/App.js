@@ -8,6 +8,7 @@ import MembersScreen from "./screens/membersScreen/membersScreen";
 import AttendanceScreen from "./screens/attendanceScreen/attendanceScreen";
 import Sidebar from "./components/Sidebar/Sidebar";
 import './App.css'
+import Enable2FAScreen from "./screens/enable2FAScreen/enable2FAScreen";
 
 
 function Layout({ children }) {
@@ -102,6 +103,10 @@ function App() {
         <Route
           path="/attendance"
           element={<Layout><AttendanceScreen /></Layout>}
+        />
+        <Route
+          path="/enable2FA"
+          element={<Layout><Enable2FAScreen/></Layout>}
         />
       </Routes>
     </div>
