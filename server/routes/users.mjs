@@ -3,13 +3,18 @@ import db from "../db/conn.mjs";
 import { ObjectId } from "mongodb";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import qrcode from "qrcode";
+import { authenticator } from 'otplib';
+
+
+
 var secret = "secretkey";
 
 const router = express.Router();
 
 //Login
 router.post("/login", async (req, res) => {
-    const { isAdmin, email, password } = req.body;
+    const { isAdmin, email, password, code } = req.body;
 
     try {
         // find user in "users" collection from MongoDB
@@ -29,7 +34,24 @@ router.post("/login", async (req, res) => {
 
         // Check if the selected role matches the user's role
         if ((isAdmin && user.isAdmin) || (!isAdmin && !user.isAdmin)) {
-            // If the password is correct and the role matches, generate a token
+
+            if (user.twoFA.enabled) {
+
+                if (!code) {
+                    return res.json({
+                        codeRequested: true
+                    })
+                }
+                
+                //2FA is enabled, check the provided code
+                const verified = authenticator.check(code, user.twoFA.secret);
+
+                if (!verified) {
+                    return res.status(401).json({ message: "Invalid 2FA Code" });
+                }
+            }
+
+            //Generate a token
             const token = jwt.sign({ userId: user._id, isAdmin: user.isAdmin }, secret);
 
             // Send the token in the response
@@ -117,7 +139,10 @@ router.post("/member/add/:token", async (req, res) => {
             instrument: req.body.instrument,
             yearOfStudy: req.body.yearOfStudy,
             profilePic: req.body.profilePic,
-            dateJoined: new Date().toLocaleDateString('en-GB').split('/').join('-')  // Format: "DD-MM-YYYY"
+            dateJoined: new Date().toLocaleDateString('en-GB').split('/').join('-'),  // Format: "DD-MM-YYYY"
+            twoFA: {
+                enabled: false
+            }
         };
 
         // Insert the new user into the database
@@ -216,6 +241,103 @@ router.delete("/member/:token/:id", async (req, res) => {
     }
 
 
+});
+
+//Generate QR Code for 2FA
+router.get("/qrImage/:token", async (req, res) => {
+
+    let collection = await db.collection("users");
+
+    const decodedToken = jwt.verify(req.params.token, secret);
+    const userID = decodedToken.userId;
+
+    const query = { _id: new ObjectId(userID) };
+    let user = await collection.findOne(query);
+
+    try {
+        let OTPSecret;
+        if (user.twoFA.tempSecret) {
+            // Use the existing tempSecret if it already exists
+            OTPSecret = user.twoFA.tempSecret;
+        } else {
+
+            OTPSecret = authenticator.generateSecret();
+            console.log(OTPSecret);
+
+            const updateQuery = { _id: new ObjectId(userID) };
+            const updates = {
+                $set: {
+                    "twoFA.tempSecret": OTPSecret
+                }
+            }
+            await collection.updateOne(updateQuery, updates);
+        }
+
+        const uri = authenticator.keyuri(userID, "Band CCA 2FA", OTPSecret);
+        console.log("QR Code URI: ", uri);
+        const qrImage = await qrcode.toDataURL(uri);
+
+        res.status(200).json({
+            success: true,
+            qrImage
+        });
+
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false });
+    }
+});
+
+//Set 2FA
+router.post("/set2FA/:token", async (req, res) => {
+
+    let collection = await db.collection("users");
+
+    try {
+
+        const decodedToken = jwt.verify(req.params.token, secret);
+        const userID = decodedToken.userId;
+
+        let query = { _id: new ObjectId(userID) };
+        let user = await collection.findOne(query);
+
+        const code = req.body.code;
+        const tempSecret = user.twoFA.tempSecret;
+
+        const verified = authenticator.check(code, tempSecret);
+        console.log(verified);
+
+        if (!verified) {
+            return res.status(400).json({
+                message: "Invalid 2FA Code, Not Verified.",
+                details: {
+                    code: code,
+                    tempSecret: tempSecret
+                }
+            })
+        }
+
+        const updates = {
+            $set: {
+                "twoFA.enabled": true,
+                "twoFA.secret": tempSecret
+            },
+            $unset: {
+                "twoFA.tempSecret": 1 // 1 means true, indicating to remove the field
+            }
+        }
+
+        await collection.updateOne(query, updates);
+
+        return res.status(200).json({
+            success: true
+        })
+
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success: false, error: error.message });
+    }
 });
 
 export default router

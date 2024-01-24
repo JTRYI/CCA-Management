@@ -14,6 +14,9 @@ function LoginForm() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [code, setCode] = useState('');
+
+  const [twoFAEnabled, setTwoFAEnabled] = useState(false);
 
   const [selectedRole, setSelectedRole] = useState('false'); // Default value 'false' for Member
   const [show, setShow] = useState(false);
@@ -21,7 +24,8 @@ function LoginForm() {
 
   const [validationErrors, setValidationErrors] = useState({
     email: '',
-    password: ''
+    password: '',
+    code: '',
   });
 
   const navigate = useNavigate();
@@ -69,17 +73,24 @@ function LoginForm() {
         body: JSON.stringify({
           isAdmin: selectedRole === 'true', // Convert string to boolean,
           email: email,
-          password: password
+          password: password,
+          code: code
         }),
       });
 
       const data = await response.json();
       // console.log(data);
 
+      if (data.codeRequested) {
+        setTwoFAEnabled(true);
+      }
+
       if (data.token) {
         // If the login is successful, navigate to the /home route
         setEmail('');
         setPassword('');
+        setCode('');
+        setTwoFAEnabled(false);
         navigate('/home');
         sessionStorage.setItem('token', data.token);
         // console.log(data.token);
@@ -88,6 +99,7 @@ function LoginForm() {
         // Handle login failure
         setEmail('');
         setPassword('');
+        setTwoFAEnabled(false);
         errors.push({ field: 'email', message: 'Invalid email or password.' });
         errors.push({ field: 'password', message: 'Invalid email or password.' });
         // Update validation errors state with the error message
@@ -153,6 +165,19 @@ function LoginForm() {
           </InputGroup>
           <FormErrorMessage>{validationErrors.password}</FormErrorMessage>
         </FormControl>
+
+        {twoFAEnabled && <FormControl className='code-form' isInvalid={validationErrors.code !== ''}>
+          <FormLabel color={'white'} >2FA Code</FormLabel>
+          <Input type='text' width="90%" textColor={'white'} focusBorderColor='white' value={code}
+          placeholder='Enter 2FA Code'
+            onChange={
+              (e) => {
+                setCode(e.target.value);
+                // Clear the validation error when the user starts typing
+                setValidationErrors((prevErrors) => ({ ...prevErrors, code: '' }));
+              }} />
+          <FormErrorMessage>{validationErrors.code}</FormErrorMessage>
+        </FormControl>}
 
         <Button type='submit' className='login-btn' color={'white'} backgroundColor="#996515" borderRadius="30" width="30%"
           _hover={{
