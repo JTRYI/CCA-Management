@@ -301,6 +301,7 @@ function AddModal({ isOpen, onOpen, onClose, afterCloseCallback }) {
 
     setForm({ email: "", password: "", name: "", instrument: "", yearOfStudy: "", profilePic: null });
     setConfirmPassword("");
+    setValidationErrors({ email: "", password: "", confirmPassword: "", name: "", instrument: "", yearOfStudy: "" });
     // Calling the callback function passed from the parent component, this function will call handleModalClose function in
     // membersScreen.js to re-render the table showing the added member.
     afterCloseCallback();

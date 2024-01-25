@@ -105,6 +105,7 @@ function LoginForm() {
       }
 
       if (data.message == "Invalid 2FA Code") {
+        setCode('');
         errors.push({ field: 'code', message: 'Invalid 2FA Code.' });
         // Update validation errors state with the error message
         setValidationErrors((prevErrors) => {
