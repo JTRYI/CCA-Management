@@ -26,10 +26,6 @@ function Sidebar() {
       icon: "icons/users-solid.svg"
     },
     {
-      text: "Attendance",
-      icon: "icons/calendar-days-solid.svg"
-    },
-    {
       text: "Logout",
       icon: "icons/right-from-bracket-solid.svg"
     },

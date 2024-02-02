@@ -5,7 +5,6 @@ import LoginScreen from "./screens/loginScreen/loginScreen";
 import HomeScreen from "./screens/homeScreen/homeScreen";
 import AnnouncementScreen from "./screens/announcementScreen/announcementScreen";
 import MembersScreen from "./screens/membersScreen/membersScreen";
-import AttendanceScreen from "./screens/attendanceScreen/attendanceScreen";
 import Sidebar from "./components/Sidebar/Sidebar";
 import './App.css'
 import Enable2FAScreen from "./screens/enable2FAScreen/enable2FAScreen";
@@ -99,10 +98,6 @@ function App() {
         <Route
           path="/members"
           element={<Layout><MembersScreen /></Layout>}
-        />
-        <Route
-          path="/attendance"
-          element={<Layout><AttendanceScreen /></Layout>}
         />
         <Route
           path="/enable2FA"
