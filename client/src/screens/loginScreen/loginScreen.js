@@ -1,16 +1,20 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React, { useEffect } from 'react';
 import './loginScreen.css';
 import LoginForm from '../../components/loginForm/loginForm';
 
-const LoginScreen = () => (
-  <div className="loginScreen">
-        <LoginForm/>
-  </div>
-);
+function LoginScreen() {
 
-LoginScreen.propTypes = {};
+  useEffect(() => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
+  }, []);
 
-LoginScreen.defaultProps = {};
+  return (
+    <div className="loginScreen">
+      <LoginForm />
+    </div>
+  )
+};
+
 
 export default LoginScreen;
